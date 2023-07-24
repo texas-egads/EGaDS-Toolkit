@@ -68,7 +68,6 @@ namespace egads.tools.utils
 			}
 
 			valuesList[keyIndex] = data;
-
 		}
 
 		public TKey GetKey(TKey key)
