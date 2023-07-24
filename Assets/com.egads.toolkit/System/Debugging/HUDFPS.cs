@@ -26,6 +26,8 @@ namespace egads.system.debugging
 
         #endregion
 
+        #region Unity Methods
+
         private void Start()
 		{
 			_textComponent = GetComponent<Text>();
@@ -65,7 +67,9 @@ namespace egads.system.debugging
 				frames = 0;
 			}
 		}
-	}
+
+        #endregion
+    }
 }
 
 #endif
