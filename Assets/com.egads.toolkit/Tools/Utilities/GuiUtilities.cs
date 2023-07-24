@@ -50,7 +50,6 @@ namespace egads.tools.utils
 				float width = originWidth * verticalPortion;
 
 				if (drawRatio > originRatio) { width = height / originRatio; }
-
 				float offsetX = (originWidth - width) * 0.5f;
 				float offsety = (originHeight - height) * 0.5f;
 
