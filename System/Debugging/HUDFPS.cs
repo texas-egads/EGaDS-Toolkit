@@ -61,7 +61,6 @@ namespace egads.system.debugging
 					if (fps < 10) { _textComponent.color = Color.red; }
 					else { _textComponent.color = Color.green; }	
 				}
-
 				timeleft = updateInterval;
 				accum = 0.0F;
 				frames = 0;
