@@ -1,0 +1,23 @@
+﻿{
+  "name": "com.egads.toolkit",
+  "version": "1.0.0",
+  "displayName": "EGaDS Toolkit",
+  "description": "This is a package loaded with useful code, art, and sound assets for developing your game!",
+  "unity": "2021.3",
+  "unityRelease": "4f1",
+  "documentationUrl": "https://github.com/texas-egads/EGaDS-Toolkit",
+  "changelogUrl": "https://github.com/texas-egads/EGaDS-Toolkit",
+  "licensesUrl": "https://github.com/texas-egads/EGaDS-Toolkit",
+  "dependencies": {
+
+  },
+  "keywords": [
+    "EGaDS",
+    "Toolkit"
+  ],
+  "author": {
+    "name": "EGaDS",
+    "email": "texasegads@gmail.com",
+    "url": "https://texasegads.wixsite.com/egads"
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "egads.egads-toolkit.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:1cdc61c8c2579804093100a72186be2a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
