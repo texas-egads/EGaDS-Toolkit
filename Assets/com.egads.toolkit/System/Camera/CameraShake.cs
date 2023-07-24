@@ -52,7 +52,6 @@ namespace egads.system.camera
 		public void Shake(float amount)
 		{
 			if (_shake <= 0.0f) { _originalPos = _camera.transform.localPosition; }
-
 			_shake = amount;
 		}
 
