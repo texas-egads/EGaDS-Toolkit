@@ -20,7 +20,6 @@ jobs:
         branch: main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PERSONAL_ACCESS_TOKEN: ${{ secrets.EGADS_TOOLKIT }}
     - name: Create upm branch
       run: |
         git branch -d upm &> /dev/null || echo upm branch not found
