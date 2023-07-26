@@ -16,7 +16,10 @@ namespace egads.system.UI
 		public bool hasMultipleStates => _stack.Count > 1;
 		public bool hasState => _stack.Count > 0;
 
-		public IUIState<T> current
+        #endregion
+
+        #region Public Methods
+        public IUIState<T> current
 		{
 			get
 			{
