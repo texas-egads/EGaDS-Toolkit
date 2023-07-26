@@ -77,7 +77,6 @@ namespace egads.system.input
 			if (Mathf.Abs(hInput) > Mathf.Abs(vInput))
 			{
 				if (!UpdateHorizontal(hInput)) { UpdateVertical(vInput); }
-					
 			}
 			else
 			{
