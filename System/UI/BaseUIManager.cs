@@ -14,9 +14,7 @@ namespace egads.system.UI
         #region Public Properties
 
         public static BaseUIManager Instance = null;
-
 		public static bool useBigFont = false;
-
 		public static bool pointerIsOverUI
 		{
 			get
