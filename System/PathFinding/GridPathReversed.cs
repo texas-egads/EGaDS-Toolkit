@@ -26,7 +26,6 @@ namespace egads.system.pathFinding
         public void SetDimensions(int maxColumn, int maxRow)
 		{
 			int maxSize = (maxColumn + maxRow) * 5;
-
 			for (int i = 0; i < maxSize; i++)
 			{
 				_path.Add(new GridPosition(0, 0));
