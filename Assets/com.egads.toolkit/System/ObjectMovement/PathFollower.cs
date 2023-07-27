@@ -40,7 +40,6 @@ namespace egads.system.objectMovement
 
 			_currentPoint = path.GetPathEnumerator();
 			_currentPoint.MoveNext();
-
 			if (_currentPoint.Current != null) { transform.position = _currentPoint.Current.position; }
 		}
 
