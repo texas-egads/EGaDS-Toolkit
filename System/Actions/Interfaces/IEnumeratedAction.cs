@@ -9,6 +9,11 @@ namespace egads.system.actions
     {
         #region Methods
 
+        /// <summary>
+        /// This method represents the action's execution process as an IEnumerator.
+        /// It allows the action to be executed in multiple steps and supports iteration.
+        /// </summary>
+        /// <returns>An IEnumerator representing the execution process of the action.</returns>
         IEnumerator Execute();
 
         #endregion

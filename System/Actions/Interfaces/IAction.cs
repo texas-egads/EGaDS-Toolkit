@@ -8,6 +8,9 @@ namespace egads.system.actions
     {
         #region Methods
 
+        /// <summary>
+        /// Executes the action.
+        /// </summary>
         void Execute();
 
         #endregion

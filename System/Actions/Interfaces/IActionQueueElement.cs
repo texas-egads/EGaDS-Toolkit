@@ -11,15 +11,29 @@ namespace egads.system.actions
 	{
         #region Properties
 
+        /// <summary>
+        /// Gets a value indicating whether the action has ended.
+        /// </summary>
         bool hasEnded { get; }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Called when the action starts. Perform any necessary setup here.
+        /// </summary>
         void OnStart();
-		void Update();
-		void OnExit();
+
+        /// <summary>
+        /// Called each frame while the action is ongoing. Implement the main logic of the action here.
+        /// </summary>
+        void Update();
+
+        /// <summary>
+        /// Called when the action is completed or interrupted. Clean up resources or perform final actions here.
+        /// </summary>
+        void OnExit();
 
         #endregion
     }
