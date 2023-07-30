@@ -1,6 +1,6 @@
-# Unity Actions System User Guide
+# Actions System User Guide
 
-The Unity Actions System is a set of interfaces and classes designed to manage and execute actions in a flexible and organized manner. Actions can be performed either in parallel (ActionList) or sequentially (ActionQueue). The system allows you to define custom actions by implementing the provided interfaces.
+This Actions System is a set of interfaces and classes designed to manage and execute actions in a flexible and organized manner. Actions can be performed either in parallel (ActionList) or sequentially (ActionQueue). The system allows you to define custom actions by implementing the provided interfaces.
 
 ## Table of Contents
 
