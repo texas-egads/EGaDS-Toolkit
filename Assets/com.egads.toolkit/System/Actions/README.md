@@ -83,33 +83,31 @@ Here's an example of creating a custom action using the provided interfaces:
 
 ```csharp
 using UnityEngine;
+using egads.system.actions
 
-namespace egads.system.actions
+public class CustomAction : IActionQueueElement
 {
-    public class CustomAction : IActionQueueElement
+    private bool _isCompleted;
+
+    public bool hasEnded => _isCompleted;
+
+    public void OnStart()
     {
-        private bool _isCompleted;
+        // Perform setup and initialization for the custom action.
+        _isCompleted = false;
+    }
 
-        public bool hasEnded => _isCompleted;
+    public void Update()
+    {
+        // Implement the main logic of the custom action.
+        // For example, move a game object from one position to another.
+        // Once the action is completed, set _isCompleted to true.
+        // This will signal the ActionQueue to proceed to the next action.
+    }
 
-        public void OnStart()
-        {
-            // Perform setup and initialization for the custom action.
-            _isCompleted = false;
-        }
-
-        public void Update()
-        {
-            // Implement the main logic of the custom action.
-            // For example, move a game object from one position to another.
-            // Once the action is completed, set _isCompleted to true.
-            // This will signal the ActionQueue to proceed to the next action.
-        }
-
-        public void OnExit()
-        {
-            // Perform cleanup or final actions when the action is completed or interrupted.
-        }
+    public void OnExit()
+    {
+        // Perform cleanup or final actions when the action is completed or interrupted.
     }
 }
 ```
