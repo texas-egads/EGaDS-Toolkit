@@ -9,12 +9,12 @@ The Unity Actions System is a set of interfaces and classes designed to manage a
    - [IAction](#iaction)
    - [IActionQueueElement](#iactionqueueelement)
    - [IEnumeratedAction](#ienumeratedaction)
-3. [Base Class](#base-class)
+3. [Classes](#classes)
    - [ActionBase](#actionbase)
-4. [ActionList](#actionlist)
-5. [ActionQueue](#actionqueue)
-6. [Custom Action Example](#custom-action-example)
-7. [Usage Examples](#usage-examples)
+   - [ActionList](#actionlist)
+   - [ActionQueue](#actionqueue)
+4. [Custom Action Example](#custom-action-example)
+5. [Usage Examples](#usage-examples)
 
 ## Overview
 
@@ -42,7 +42,7 @@ The `IEnumeratedAction` interface represents an action whose execution process c
 
 - `IEnumerator Execute()`: Represents the action's execution process as an IEnumerator.
 
-## Base Class
+## Classes
 
 ### ActionBase
 
