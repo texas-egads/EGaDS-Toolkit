@@ -3,26 +3,49 @@ using egads.system.gameManagement;
 
 namespace egads.system.application
 {
+    /// <summary>
+    /// Contains information about the application's settings and platform-specific configurations.
+    /// </summary>
     public class ApplicationInfo
     {
         #region Public Properties
 
+        /// <summary>
+        /// Whether the device has two mouse buttons (e.g., right-click and left-click).
+        /// </summary>
         public bool hasTwoMouseButtons = false;
+
+        /// <summary>
+        /// Whether the application uses two mouse buttons for input.
+        /// </summary>
         public bool useTwoMouseButtons = false;
+
+        /// <summary>
+        /// Whether the device supports touch input.
+        /// </summary>
         public bool hasTouch = false;
+
+        /// <summary>
+        /// Whether the device supports mouse input.
+        /// </summary>
         public bool hasMouse = false;
 
         #endregion
 
         #region Gamepad Setup
+
+        /// <summary>
+        /// Checks if the application uses a gamepad for input.
+        /// </summary>
         public bool usesGamepad
         {
             get
             {
-                #if !UNITY_WP8
+#if !UNITY_WP8
+                // Check if any joystick is connected.
                 if (Input.GetJoystickNames().Length > 0) { return true; }
-				if (isOuyaSupportedHardware) { return true; }
-                #endif
+
+#endif
 
                 return false;
             }
@@ -30,39 +53,23 @@ namespace egads.system.application
 
         #endregion
 
-        #region Ouya Setup
+        #region Constructor
 
-        private bool _isOuya = false;
-        public bool isOuyaSupportedHardware
-        {
-            get { return _isOuya; }
-            set
-            {
-                _isOuya = value;
-                if (_isOuya) { hasTouch = false; }
-            }
-        }
-
-        public bool canPostOnSocialNetworks => (!isOuyaSupportedHardware && !(Application.platform == RuntimePlatform.WebGLPlayer));
-
-        #endregion
-
-        #region Contructor
-
+        /// <summary>
+        /// Initializes a new instance of the ApplicationInfo class and sets the platform-specific settings.
+        /// </summary>
         public ApplicationInfo()
         {
             SetPlatformSettings();
 
-            useTwoMouseButtons = hasTwoMouseButtons;
-
-            // Load input setting
+            // Load input setting from PlayerPrefs.
             if (PlayerPrefs.HasKey("INPUT_USETWOMOUSEBUTTONS"))
             {
                 int useTwoMouseButtonsSetting = PlayerPrefs.GetInt("INPUT_USETWOMOUSEBUTTONS");
                 useTwoMouseButtons = useTwoMouseButtonsSetting == 1;
             }
 
-            // Debug: override settings
+            // Debug: Override settings in the Unity editor.
             if (Application.isEditor && MainBase.Instance.debugIsTouch)
             {
                 hasTouch = true;
@@ -70,32 +77,34 @@ namespace egads.system.application
                 useTwoMouseButtons = false;
             }
 
-            // Debug: override settings
-            if (Application.isEditor && MainBase.Instance.debugDisableAudio)
-            {
-                AudioListener.volume = 0;
-            }
+            // Debug: Disable audio in the Unity editor.
+            if (Application.isEditor && MainBase.Instance.debugDisableAudio) { AudioListener.volume = 0; }
         }
 
         #endregion
 
         #region Two Mouse Button Mode
 
+        /// <summary>
+        /// Sets the application's two mouse button mode.
+        /// </summary>
+        /// <param name="setting">The value indicating whether to use two mouse buttons.</param>
         public void SetTwoMouseButtonMode(bool setting)
         {
             useTwoMouseButtons = setting;
 
-            // Save input setting to File
-            if (setting)
-                PlayerPrefs.SetInt("INPUT_USETWOMOUSEBUTTONS", 1);
-            else
-                PlayerPrefs.SetInt("INPUT_USETWOMOUSEBUTTONS", 0);
+            // Save input setting to PlayerPrefs.
+            if (setting) { PlayerPrefs.SetInt("INPUT_USETWOMOUSEBUTTONS", 1); }
+            else { PlayerPrefs.SetInt("INPUT_USETWOMOUSEBUTTONS", 0); }
         }
 
         #endregion
 
         #region Platform Settings
 
+        /// <summary>
+        /// Sets the platform-specific settings based on the current application platform.
+        /// </summary>
         private void SetPlatformSettings()
         {
             switch (Application.platform)
@@ -103,8 +112,6 @@ namespace egads.system.application
                 case RuntimePlatform.Android:
                     hasTwoMouseButtons = false;
                     hasTouch = true;
-                    if (isOuyaSupportedHardware)
-                        hasTouch = false;
                     break;
                 case RuntimePlatform.IPhonePlayer:
                     hasTwoMouseButtons = false;
@@ -118,11 +125,11 @@ namespace egads.system.application
                     hasTwoMouseButtons = false;
                     hasMouse = true;
                     break;
-				case RuntimePlatform.WSAPlayerX64:
+                case RuntimePlatform.WSAPlayerX64:
                     hasTwoMouseButtons = false;
                     hasMouse = true;
                     break;
-				case RuntimePlatform.WSAPlayerX86:
+                case RuntimePlatform.WSAPlayerX86:
                     hasTwoMouseButtons = false;
                     hasMouse = true;
                     break;
