@@ -1,17 +1,29 @@
-﻿
-namespace egads.system.actors
+﻿namespace egads.system.actors
 {
-	public interface IActorTimedAction
-	{
+    /// <summary>
+    /// Interface representing an actor's timed action in the game.
+    /// </summary>
+    public interface IActorTimedAction
+    {
         #region Properties
 
+        /// <summary>
+        /// Gets the range of the timed action.
+        /// </summary>
         float range { get; }
-		float cooldown { get; }
+
+        /// <summary>
+        /// Gets the cooldown time for the timed action.
+        /// </summary>
+        float cooldown { get; }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Executes the timed action.
+        /// </summary>
         void Execute();
 
         #endregion
