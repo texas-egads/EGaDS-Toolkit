@@ -6,64 +6,117 @@ using egads.tools.utils;
 using egads.system.actions;
 using egads.system.timer;
 using egads.system.gameManagement;
-using TMPro;
 
 namespace egads.system.actors
 {
-	public class Actor2D : MonoBehaviour, IPooledObject, IActor, IHasHealth
+    /// <summary>
+    /// A 2D actor class that implements IPooledObject, IActor, and IHasHealth interfaces.
+    /// </summary>
+    public class Actor2D : MonoBehaviour, IPooledObject, IActor, IHasHealth
 	{
         #region Constants
 
+        /// <summary>
+        /// Minimum movement threshold for triggering animations.
+        /// </summary>
         public const float MINIMUM_MOVEMENT_FOR_ANIMATIONS = 0.01f;
+
+        /// <summary>
+        /// Distance to target considered as reached.
+        /// </summary>
         public const float TARGET_DISTANCE = 0.5f;
+
+        /// <summary>
+        /// Time until the actor is destroyed after death.
+        /// </summary>
         public const float TIME_UNTIL_DESTRUCTION = 10.0f;
 
         #endregion
 
         #region Delegates
 
+        /// <summary>
+        /// Delegate for estimating the future position of the actor after a given time.
+        /// </summary>
+        /// <param name="time">The time in seconds to estimate the future position for.</param>
+        /// <returns>The estimated future position of the actor.</returns>
         public delegate Vector2 GetEstimatedFuturePositionDelegate(float time);
+
+        /// <summary>
+        /// Delegate for checking if there are possible targets within the actor's range.
+        /// </summary>
+        /// <returns>True if there are possible targets within range, false otherwise.</returns>
         public delegate bool HasPossibleTargetsInRangeDelegate();
+
+        /// <summary>
+        /// Delegate for handling the execution when the actor dies.
+        /// </summary>
         public delegate void DeathExecutionDelegate();
+
+        /// <summary>
+        /// Delegate for handling when the actor is damaged.
+        /// </summary>
         public delegate void WasDamagedDelegate();
 
         #endregion
 
         #region Events
 
+        /// <summary>
+        /// Event triggered to estimate the future position of the actor.
+        /// </summary>
         public GetEstimatedFuturePositionDelegate GetEstimatedFuturePosition;
 
-		
-		public HasPossibleTargetsInRangeDelegate HasPossibleTargetsInRange = delegate { return false; };
 
-		
-		public DeathExecutionDelegate deathExecutionHandler;
+        /// <summary>
+        /// Event triggered to check if there are possible targets within range of the actor.
+        /// </summary>
+        public HasPossibleTargetsInRangeDelegate HasPossibleTargetsInRange = delegate { return false; };
 
-		
-		public event WasDamagedDelegate wasDamaged;
+        /// <summary>
+        /// Event triggered when the actor's death execution is required.
+        /// </summary>
+        public DeathExecutionDelegate deathExecutionHandler;
 
-		public event StateChanged stateChanged;
+        /// <summary>
+        /// Event triggered when the actor is damaged.
+        /// </summary>
+        public event WasDamagedDelegate wasDamaged;
 
-		#endregion
+        /// <summary>
+        /// Event triggered when the state of the actor changes.
+        /// </summary>
+        public event StateChanged stateChanged;
 
-		#region State
+        #endregion
 
-		[SerializeField]
+        #region State
+
+        [SerializeField]
 		private ActorState _state = ActorState.Idle;
-		public ActorState state
+
+        /// <summary>
+        /// The current state of the actor.
+        /// </summary>
+        public ActorState state
 		{
 			get { return _state; }
 			private set
 			{
-				if (_transform == null) { return; }
+                // Ignore if the actor's transform is null (prevents unnecessary changes when the object is being destroyed).
+                if (_transform == null) { return; }
 
-				if (_state == value) { return; }
+                // If the state has not changed, do nothing.
+                if (_state == value) { return; }
 
-				_state = value;
+                // Set the new state.
+                _state = value;
 
-				if (stateChanged != null) { stateChanged(this, _state); }
+                // Trigger the stateChanged event if there are subscribers.
+                if (stateChanged != null) { stateChanged(this, _state); }
 
-				if (_state == ActorState.Disabled && getsDisabled != null) { getsDisabled(this); }
+                // Trigger the getsDisabled event if the state changes to Disabled and there are subscribers.
+                if (_state == ActorState.Disabled && getsDisabled != null) { getsDisabled(this); }
 			}
 		}
 
@@ -74,51 +127,77 @@ namespace egads.system.actors
         #region Stats
 
         [SerializeField]
-		private float _maxHealth = 10.0f;
+        private float _maxHealth = 10.0f;
 
-		private Energy _health;
-		public Energy health
-		{
-			get
-			{
-				if (_health == null) { _health = new Energy(_maxHealth); }
-				return _health;
-			}
-			set { _health = value; }
-		}
+        private Energy _health;
 
-		public bool needsHealing => (isAlive && !health.isFull);
+        /// <summary>
+        /// The current health of the actor.
+        /// </summary>
+        public Energy health
+        {
+            get
+            {
+                if (_health == null) { _health = new Energy(_maxHealth); }
+                return _health;
+            }
+            set { _health = value; }
+        }
 
-		public float movementSpeed = 6.0f;
+        /// <summary>
+        /// Returns true if the actor needs healing.
+        /// </summary>
+        public bool needsHealing => (isAlive && !health.isFull);
 
-		[HideInInspector]
-		public float verticalMovementDampening = 1f;
+        public float movementSpeed = 6.0f;
 
-		[HideInInspector]
-		public ActorTarget target;
+        [HideInInspector]
+        public float verticalMovementDampening = 1f;
 
-		public Vector2 lookDirection = Vector2.zero;
+        [HideInInspector]
+        public ActorTarget target;
 
-		public Transform actionPivot;
+        public Vector2 lookDirection = Vector2.zero;
+
+        public Transform actionPivot;
 
         #endregion
 
         #region Global Values
 
+        /// <summary>
+        /// The color used for displaying healing effects.
+        /// </summary>
         public static Color healingColor = new Color(0.58f, 0.91f, 0.82f);
 
         #endregion
 
         #region Getters and Setters
 
+        /// <summary>
+        /// The 2D position of the actor.
+        /// </summary>
         public Vector2 position2D => _transform.position;
-		public Vector3 position => _transform.position;
 
-		public bool isAlive => !(state == ActorState.Dead || state == ActorState.Disabled);
+        /// <summary>
+        /// The 3D position of the actor.
+        /// </summary>
+        public Vector3 position => _transform.position;
 
-		public bool isEnabled => !(state == ActorState.Disabled);
+        /// <summary>
+        /// Returns true if the actor is alive.
+        /// </summary>
+        public bool isAlive => !(state == ActorState.Dead || state == ActorState.Disabled);
 
-		public bool isReady => (state == ActorState.Idle || state == ActorState.Moving);
+        /// <summary>
+        /// Returns true if the actor is enabled (not disabled).
+        /// </summary>
+        public bool isEnabled => !(state == ActorState.Disabled);
+
+        /// <summary>
+        /// Returns true if the actor is ready to perform actions.
+        /// </summary>
+        public bool isReady => (state == ActorState.Idle || state == ActorState.Moving);
 
         #endregion
 
@@ -126,156 +205,174 @@ namespace egads.system.actors
 
         #region Actions
 
+        /// <summary>
+        /// The timed action that this actor can perform.
+        /// </summary>
         public IActorTimedAction action;
 
-		#endregion
+        #endregion
 
-		#region Display
+        #region Display
 
-		public Texture2D interfacePortrait;
-		public GameObject displayObject;
-		public bool directionRight = true;
-		public bool canFlip = true;
+        /// <summary>
+        /// The portrait displayed in the user interface for this actor.
+        /// </summary>
+        public Texture2D interfacePortrait;
 
-		[HideInInspector]
-		public bool isMoving = false;
+        /// <summary>
+        /// The GameObject representing the visual display of this actor.
+        /// </summary>
+        public GameObject displayObject;
 
-		private IAnimationController _animationController;
+        /// <summary>
+        /// Indicates whether the actor is facing to the right direction.
+        /// </summary>
+        public bool directionRight = true;
 
-		// variables for showing a hit
-		private Timer _hitTimer = null;
-		private Color _originalColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        /// <summary>
+        /// Indicates whether the actor can flip its visual display.
+        /// </summary>
+        public bool canFlip = true;
 
-		#endregion
+        /// <summary>
+        /// Flag indicating if the actor is currently moving.
+        /// </summary>
+        [HideInInspector]
+        public bool isMoving = false;
 
-		#region Private Properties
+        /// <summary>
+        /// The interface to control animations for this actor.
+        /// </summary>
+        private IAnimationController _animationController;
 
-		private Transform _transform;
-		private Rigidbody2D _rigidbody2D;
-		private Collider2D _collider2D;
-		private Timer _actionTimer = null;
+        // Variables for showing a hit (used for visual feedback when actor is damaged)
+        private Timer _hitTimer = null;
+        private Color _originalColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
-		private Vector2 _lastMovement = Vector2.zero;
-		private Vector2 _lastDirectMovement = Vector2.zero;
-		private int _gotDirectMovementInput = 0;
+        #endregion
 
-		#endregion
+        #region Private Properties
 
-		#region Unity methods
+        // Cached references to frequently accessed components
+        private Transform _transform;
+        private Rigidbody2D _rigidbody2D;
+        private Collider2D _collider2D;
+        private Timer _actionTimer = null;
 
-		void Awake()
-		{
-			_transform = transform;
-			_rigidbody2D = GetComponent<Rigidbody2D>();
-			_collider2D = GetComponent<Collider2D>();
-			_animationController = _transform.GetInterface<IAnimationController>();
-			target = new ActorTarget(this, _transform);
+        // Cached values for movement and input handling
+        private Vector2 _lastMovement = Vector2.zero;
+        private Vector2 _lastDirectMovement = Vector2.zero;
+        private int _gotDirectMovementInput = 0;
 
-			if (_health == null)
-				health = new Energy(_maxHealth);
+        #endregion
 
-			// Set callback functions
-			GetEstimatedFuturePosition = EstimateFuturePosition;
-			deathExecutionHandler = DestroyAtDeath;
+        #region Unity methods
 
-			Reset();
-		}
+        /// <summary>
+        /// Called when the GameObject is initialized.
+        /// Initializes references to components and sets up the actor's health and target.
+        /// </summary>
+        void Awake()
+        {
+            _transform = transform;
+            _rigidbody2D = GetComponent<Rigidbody2D>();
+            _collider2D = GetComponent<Collider2D>();
+            _animationController = _transform.GetInterface<IAnimationController>();
+            target = new ActorTarget(this, _transform);
 
-		void Update()
-		{
-			// We use this so direct movement input gets stopped at some point if there is silent communication from the input side
-			if (_gotDirectMovementInput > 0 && target.hasTarget)
-			{
-				_gotDirectMovementInput--;
+            if (_health == null) { health = new Energy(_maxHealth); }
 
-				if (_gotDirectMovementInput == 0)
-				{
-					StopMovement();
-				}
-			}
-		}
+            // Set callback functions
+            GetEstimatedFuturePosition = EstimateFuturePosition;
+            deathExecutionHandler = DestroyAtDeath;
 
-		void FixedUpdate()
-		{
-			// Do nothing when game is not running
-			if (MainBase.Instance == null || (MainBase.Instance.state != GameState.Running && MainBase.Instance.state != GameState.Sequence)) { return; }
+            Reset();
+        }
 
-			// Slow movement
-			if (_rigidbody2D != null)
-			{
-				if (_rigidbody2D.velocity.magnitude < 0.005f)
-				{
-					_rigidbody2D.velocity = Vector2.zero;
-					lookDirection = Vector2.zero;
-				}
-				else
-				{
-					_rigidbody2D.velocity = Vector2.Lerp(_rigidbody2D.velocity, Vector2.zero, Time.fixedDeltaTime * 5.0f);
-				}
-			}
+        /// <summary>
+        /// Called once per frame.
+        /// Stops direct movement input if there is no target and no more direct input commands.
+        /// </summary>
+        void Update()
+        {
+            // We use this so direct movement input gets stopped at some point if there is silent communication from the input side
+            if (_gotDirectMovementInput > 0 && target.hasTarget)
+            {
+                _gotDirectMovementInput--;
 
-			// Do nothing when dead
-			if (state == ActorState.Disabled || state == ActorState.Dead)
-				return;
+                if (_gotDirectMovementInput == 0) { StopMovement(); }
+            }
+        }
 
-			// Timer for hit visuals
-			if (_hitTimer != null && isAlive)
-			{
-				_hitTimer.Update();
+        /// <summary>
+        /// Called in fixed intervals (physics updates).
+        /// Handles slow movement damping, hit visuals timer, target updates, movement updates, and action updates.
+        /// </summary>
+        void FixedUpdate()
+        {
+            // Do nothing when the game is not running
+            if (MainBase.Instance == null || (MainBase.Instance.state != GameState.Running && MainBase.Instance.state != GameState.Sequence)) { return; }
 
-				if (_hitTimer.hasEnded)
-				{
-					HideDamageDisplay();
-				}
-			}
+            // Slow movement damping
+            if (_rigidbody2D != null)
+            {
+                if (_rigidbody2D.velocity.magnitude < 0.005f)
+                {
+                    _rigidbody2D.velocity = Vector2.zero;
+                    lookDirection = Vector2.zero;
+                }
+                else { _rigidbody2D.velocity = Vector2.Lerp(_rigidbody2D.velocity, Vector2.zero, Time.fixedDeltaTime * 5.0f); }
+            }
 
-			// Update target
-			target.Update();
+            // Do nothing when dead
+            if (state == ActorState.Disabled || state == ActorState.Dead) { return; }
 
-			// Update movement
-			if (state == ActorState.Moving)
-			{
-				if (!target.hasTarget)
-				{
-					if (_lastDirectMovement != Vector2.zero && movementSpeed > 0)
-					{
-						Move(_lastDirectMovement);
-					}
-					else
-					{
-						isMoving = false;
-						state = ActorState.Idle;
-						return;
-					}
-				}
-				else
-				{
-					MoveTowardsTarget();
-				}
-			}
+            // Timer for hit visuals
+            if (_hitTimer != null && isAlive)
+            {
+                _hitTimer.Update();
 
-			// Update action
-			if (_actionTimer != null)
-			{
-				_actionTimer.Update();
-				if (_actionTimer.hasEnded)
-				{
-					state = ActorState.Idle;
-					_actionTimer = null;
-				}
-				else
-				{
-					return; // Wait for actions to finish
-				}
-			}
+                if (_hitTimer.hasEnded) { HideDamageDisplay(); }
+            }
 
-			// Resume actions when idle
-			if (state == ActorState.Idle && target.hasTarget)
-			{
-				state = ActorState.Moving;
-				return;
-			}
-		}
+            // Update target
+            target.Update();
+
+            // Update movement
+            if (state == ActorState.Moving)
+            {
+                if (!target.hasTarget)
+                {
+                    if (_lastDirectMovement != Vector2.zero && movementSpeed > 0) { Move(_lastDirectMovement); }
+                    else
+                    {
+                        isMoving = false;
+                        state = ActorState.Idle;
+                        return;
+                    }
+                }
+                else { MoveTowardsTarget(); }
+            }
+
+            // Update action
+            if (_actionTimer != null)
+            {
+                _actionTimer.Update();
+                if (_actionTimer.hasEnded)
+                {
+                    state = ActorState.Idle;
+                    _actionTimer = null;
+                }
+                else { return; } // Wait for actions to finish
+            }
+
+            // Resume actions when idle and has a target
+            if (state == ActorState.Idle && target.hasTarget)
+            {
+                state = ActorState.Moving;
+                return;
+            }
+        }
 
         #endregion
 
@@ -283,190 +380,241 @@ namespace egads.system.actors
 
         #region State Manipulation
 
+        /// <summary>
+        /// Makes the actor inactive by disabling its target and setting its state to Disabled.
+        /// </summary>
         public void MakeInactive()
-		{
-			target.DisableTarget();
-			state = ActorState.Disabled;
-		}
+        {
+            target.DisableTarget();
+            state = ActorState.Disabled;
+        }
 
-		public void Disable()
-		{
-			MakeInactive();
+        /// <summary>
+        /// Disables the actor by making it inactive and optionally destroying its GameObject.
+        /// </summary>
+        public void Disable()
+        {
+            MakeInactive();
 
-			if (!_isInactiveInObjectPool) { Destroy(gameObject); }
-		}
+            if (!_isInactiveInObjectPool) { Destroy(gameObject); }
+        }
 
-		public void DisableAndFadeOut(float time)
-		{
-			MakeInactive();
+        /// <summary>
+        /// Disables the actor, fades out its animation over the specified time, and optionally destroys its GameObject.
+        /// </summary>
+        /// <param name="time">The time in seconds over which to fade out the animation before disabling the actor.</param>
+        public void DisableAndFadeOut(float time)
+        {
+            MakeInactive();
 
-			if (_animationController != null) { _animationController.FadeOut(time); }
-				
-			if (!_isInactiveInObjectPool) { Destroy(gameObject, time); }		
-		}
+            if (_animationController != null) { _animationController.FadeOut(time); }
 
-		public void Kill()
-		{
-			ApplyDamage(health.current);
-		}
+            if (!_isInactiveInObjectPool) { Destroy(gameObject, time); }
+        }
 
-		public void Reset()
-		{
-			health.Reset();
-			if (target != null) { target.DisableTarget(); }
-				
-			if (_collider2D != null) { _collider2D.enabled = true; }
-				
+        /// <summary>
+        /// Kills the actor by applying damage equal to its current health, effectively reducing its health to zero.
+        /// </summary>
+        public void Kill()
+        {
+            ApplyDamage(health.current);
+        }
 
-			if (_animationController != null) { _animationController.Reset(); }
+        /// <summary>
+        /// Resets the actor to its initial state by resetting its health, disabling its target, and setting its state to Idle.
+        /// </summary>
+        public void Reset()
+        {
+            health.Reset();
+            if (target != null) { target.DisableTarget(); }
 
-			HideDamageDisplay();
+            if (_collider2D != null) { _collider2D.enabled = true; }
 
-			state = ActorState.Idle;
-		}
+            if (_animationController != null) { _animationController.Reset(); }
 
-		// Decrease health, can be called from outside
-		public void ApplyDamage(float damage)
-		{
-			if (!isAlive)
-				return;
+            HideDamageDisplay();
 
-			health.Lose(damage);
+            state = ActorState.Idle;
+        }
 
-			if (health.isEmpty) { Die(); }
-			else { ShowDamageDisplay(0.15f, new Color(1.0f, 0.4f, 0.4f, 1.0f)); }
+        /// <summary>
+        /// Applies damage to the actor, reducing its health by the specified amount.
+        /// Triggers death if the health becomes empty, and shows damage display.
+        /// </summary>
+        /// <param name="damage">The amount of damage to apply to the actor.</param>
+        public void ApplyDamage(float damage)
+        {
+            if (!isAlive) { return; }
 
-			if (wasDamaged != null) { wasDamaged(); }
-		}
+            health.Lose(damage);
 
-		// Increase health, can be called from outside
-		public void ApplyHealing(float amount)
-		{
-			if (!isAlive) { return; }
+            if (health.isEmpty) { Die(); }
+            else { ShowDamageDisplay(0.15f, new Color(1.0f, 0.4f, 0.4f, 1.0f)); }
 
-			ShowDamageDisplay(0.25f, healingColor);
+            if (wasDamaged != null) { wasDamaged(); }
+        }
 
-			health.Add(amount);
-		}
+        /// <summary>
+        /// Applies healing to the actor, increasing its health by the specified amount.
+        /// Shows a healing damage display.
+        /// </summary>
+        /// <param name="amount">The amount of healing to apply to the actor.</param>
+        public void ApplyHealing(float amount)
+        {
+            if (!isAlive) { return; }
 
-		#endregion
+            ShowDamageDisplay(0.25f, healingColor);
 
-		#region Target Setting
+            health.Add(amount);
+        }
 
-		// Transform as new target, e.g. walking to a building, flag
-		public void SetTarget(Transform newTarget, float distance = TARGET_DISTANCE, bool determined = false)
-		{
-			if (!isAlive) { return; }
+        #endregion
 
-			target.SetTarget(newTarget, distance, determined);
+        #region Target Setting
 
-			if (state == ActorState.Idle) { state = ActorState.Moving; }
-		}
+        /// <summary>
+        /// Sets a new target for the actor as a Transform, such as walking to a building or a flag.
+        /// </summary>
+        /// <param name="newTarget">The new target Transform to set.</param>
+        /// <param name="distance">The distance at which the actor should stop when reaching the target (default is TARGET_DISTANCE).</param>
+        /// <param name="determined">Indicates whether the actor's movement is determined or not (default is false).</param>
+        public void SetTarget(Transform newTarget, float distance = TARGET_DISTANCE, bool determined = false)
+        {
+            if (!isAlive) { return; }
 
-		// Position as new target
-		public void SetTarget(Vector2 position, float distance = TARGET_DISTANCE, bool determined = false)
-		{
-			if (!isAlive) { return; }
+            target.SetTarget(newTarget, distance, determined);
 
-			target.SetTarget(position, distance, determined);
+            if (state == ActorState.Idle) { state = ActorState.Moving; }
+        }
 
-			if (state == ActorState.Idle) { state = ActorState.Moving; }	
-		}
+        /// <summary>
+        /// Sets a new target for the actor as a position in 2D space.
+        /// </summary>
+        /// <param name="position">The new target position to set.</param>
+        /// <param name="distance">The distance at which the actor should stop when reaching the target (default is TARGET_DISTANCE).</param>
+        /// <param name="determined">Indicates whether the actor's movement is determined or not (default is false).</param>
+        public void SetTarget(Vector2 position, float distance = TARGET_DISTANCE, bool determined = false)
+        {
+            if (!isAlive) { return; }
 
-		// Other actor as new target, e.g. enemy or friendly unit to be healed
-		public void SetTarget(Actor2D otherActor, bool determined = false)
-		{
-			if (!isAlive) { return; }
+            target.SetTarget(position, distance, determined);
 
-			if (action != null) { target.SetTarget(otherActor, action.range * 0.9f, determined); }
+            if (state == ActorState.Idle) { state = ActorState.Moving; }
+        }
 
-			if (state == ActorState.Idle) { state = ActorState.Moving; }
-		}
+        /// <summary>
+        /// Sets another actor as the actor's new target, such as an enemy or friendly unit to be healed.
+        /// </summary>
+        /// <param name="otherActor">The other actor to set as the target.</param>
+        /// <param name="determined">Indicates whether the actor's movement is determined or not (default is false).</param>
+        public void SetTarget(Actor2D otherActor, bool determined = false)
+        {
+            if (!isAlive) { return; }
 
-		public void SetMovement(Vector2 moveDirection)
-		{
-			if (!isAlive) { return; }
+            if (action != null) { target.SetTarget(otherActor, action.range * 0.9f, determined); }
 
-			target.DisableTarget();
+            if (state == ActorState.Idle) { state = ActorState.Moving; }
+        }
 
-			if (moveDirection == Vector2.zero)
-			{
-				_lastDirectMovement = Vector2.zero;
-				StopMovement();
-				return;
-			}
+        /// <summary>
+        /// Sets the actor's movement direction using a 2D Vector.
+        /// </summary>
+        /// <param name="moveDirection">The direction in which the actor should move.</param>
+        public void SetMovement(Vector2 moveDirection)
+        {
+            if (!isAlive) { return; }
 
-			if (moveDirection.sqrMagnitude > 1.0f) { moveDirection = moveDirection.normalized; }
+            target.DisableTarget();
 
-			_gotDirectMovementInput = 4;
-			_lastDirectMovement = moveDirection;
+            if (moveDirection == Vector2.zero)
+            {
+                _lastDirectMovement = Vector2.zero;
+                StopMovement();
+                return;
+            }
 
-			Move(moveDirection);
-			if (moveDirection.x > 0) { SetHorizontalDisplayDirection(true); }
-				
-			else if (moveDirection.x < 0) { SetHorizontalDisplayDirection(false); }
+            if (moveDirection.sqrMagnitude > 1.0f) { moveDirection = moveDirection.normalized; }
 
-			if (state == ActorState.Idle) { state = ActorState.Moving; }
-		}
+            _gotDirectMovementInput = 4;
+            _lastDirectMovement = moveDirection;
 
-		/// <summary>
-		/// Stand still at current position and don't get moved around by other actors
-		/// Used when in a passive state like dialogue
-		/// </summary>
-		public void Freeze()
-		{
-			StopMovement();
-			_rigidbody2D.isKinematic = true;
-		}
+            Move(moveDirection);
+            if (moveDirection.x > 0) { SetHorizontalDisplayDirection(true); }
+            else if (moveDirection.x < 0) { SetHorizontalDisplayDirection(false); }
 
-		public void UnFreeze()
-		{
-			_rigidbody2D.isKinematic = false;
-		}
+            if (state == ActorState.Idle) { state = ActorState.Moving; }
+        }
 
-		public void StopMovement()
-		{
-			if (isAlive)
-			{
-				_lastDirectMovement = Vector2.zero;
+        /// <summary>
+        /// Makes the actor stand still at the current position and prevents it from being moved around by other actors.
+        /// Used when in a passive state, such as during dialogue.
+        /// </summary>
+        public void Freeze()
+        {
+            StopMovement();
+            _rigidbody2D.isKinematic = true;
+        }
 
-				isMoving = false;
-				target.DisableTarget();
+        /// <summary>
+        /// Unfreezes the actor, allowing it to move and be affected by physics.
+        /// </summary>
+        public void UnFreeze()
+        {
+            _rigidbody2D.isKinematic = false;
+        }
 
-				if (state == ActorState.Moving)
-					state = ActorState.Idle;
-			}
-		}
+        /// <summary>
+        /// Stops the actor's movement, disables the target, and sets the state to Idle.
+        /// </summary>
+        public void StopMovement()
+        {
+            if (isAlive)
+            {
+                _lastDirectMovement = Vector2.zero;
 
-		public void TakeAction(Actor2D targetActor)
-		{
-			if (!isAlive)
-				return;
+                isMoving = false;
+                target.DisableTarget();
 
-			_actionTimer = new Timer(action.cooldown);
-			isMoving = false;
+                if (state == ActorState.Moving) { state = ActorState.Idle; }
+            }
+        }
 
-			// Update look direction
-			SetLookDirectionToTarget(targetActor.position2D);
+        /// <summary>
+        /// Initiates the actor to take an action on a target actor, such as attacking or using a skill.
+        /// </summary>
+        /// <param name="targetActor">The target actor on which the action will be performed.</param>
+        public void TakeAction(Actor2D targetActor)
+        {
+            if (!isAlive) { return; }
 
-			state = ActorState.TakingAction;
+            _actionTimer = new Timer(action.cooldown);
+            isMoving = false;
 
-			action.Execute();
-		}
+            // Update look direction
+            SetLookDirectionToTarget(targetActor.position2D);
 
-		public void TakeAction(IEnumeratedAction enumeratedAction)
-		{
-			isMoving = false;
-			state = ActorState.TakingAction;
+            state = ActorState.TakingAction;
 
-			StartCoroutine(StartAction(enumeratedAction));
-		}
+            action.Execute();
+        }
 
-		private IEnumerator StartAction(IEnumeratedAction enumeratedAction)
-		{
-			yield return StartCoroutine(enumeratedAction.Execute());
-			state = ActorState.Idle;
-		}
+        /// <summary>
+        /// Initiates the actor to take an action as part of an IEnumeratedAction sequence.
+        /// </summary>
+        /// <param name="enumeratedAction">The IEnumeratedAction representing the action sequence.</param>
+        public void TakeAction(IEnumeratedAction enumeratedAction)
+        {
+            isMoving = false;
+            state = ActorState.TakingAction;
+
+            StartCoroutine(StartAction(enumeratedAction));
+        }
+
+        private IEnumerator StartAction(IEnumeratedAction enumeratedAction)
+        {
+            yield return StartCoroutine(enumeratedAction.Execute());
+            state = ActorState.Idle;
+        }
 
         #endregion
 
@@ -477,199 +625,231 @@ namespace egads.system.actors
         #region Movement and Actions
 
         /// <summary>
-        /// Calculate avoidance on collision
+        /// Handles collision detection and calculates avoidance when colliding with other objects while moving.
         /// </summary>
-        /// <param name="coll"></param>
+        /// <param name="coll">The Collision2D data representing the collision.</param>
         private void OnCollisionEnter2D(Collision2D coll)
-		{
-			// Only relevant for moving objects which have a target
-			if (movementSpeed <= 0 || _rigidbody2D == null || target == null || !target.hasTarget) { return; }
+        {
+            // Only relevant for moving objects which have a target
+            if (movementSpeed <= 0 || _rigidbody2D == null || target == null || !target.hasTarget) { return; }
 
-			Vector2 targetLocation = target.GetCurrentTargetLocation();
-			Vector2 moveDirection = Utilities2D.GetNormalizedDirection(position2D, targetLocation);
+            Vector2 targetLocation = target.GetCurrentTargetLocation();
+            Vector2 moveDirection = Utilities2D.GetNormalizedDirection(position2D, targetLocation);
 
-			if (moveDirection.sqrMagnitude <= 0.03f)
-				return;
-			moveDirection = moveDirection.normalized;
+            if (moveDirection.sqrMagnitude <= 0.03f) { return; }
+            moveDirection = moveDirection.normalized;
 
-			// Get contact
-			ContactPoint2D contactPoint = coll.contacts[0];
+            // Get contact
+            ContactPoint2D contactPoint = coll.contacts[0];
 
-			// Calculate force to the right or to the left
-			Vector2 toTheRight = new Vector2(moveDirection.y, -moveDirection.x);
-			Vector2 toTheLeft = -toTheRight;
-			float angle = Vector2.Angle(contactPoint.normal, toTheRight);
-			Vector2 avoidanceVector;
+            // Calculate force to the right or to the left
+            Vector2 toTheRight = new Vector2(moveDirection.y, -moveDirection.x);
+            Vector2 toTheLeft = -toTheRight;
+            float angle = Vector2.Angle(contactPoint.normal, toTheRight);
+            Vector2 avoidanceVector;
 
-			if (angle > 90.0f) { avoidanceVector = toTheLeft; }
-			else { avoidanceVector = toTheRight; }
+            if (angle > 90.0f) { avoidanceVector = toTheLeft; }
+            else { avoidanceVector = toTheRight; }
 
-			_rigidbody2D.AddForce(avoidanceVector * 30.0f);
-		}
+            _rigidbody2D.AddForce(avoidanceVector * 30.0f);
+        }
 
-		private void MoveTowardsTarget()
-		{
-			// Check if target reached
-			if (target.isReached)
-			{
-				// Attack if possible
-				if (target.type == ActorTarget.TargetType.Actor && TargetInReach() && action != null)
-				{
-					TakeAction(target.otherActor);
-					return;
-				}
+        /// <summary>
+        /// Moves the actor towards its current target location.
+        /// </summary>
+        private void MoveTowardsTarget()
+        {
+            // Check if target reached
+            if (target.isReached)
+            {
+                // Attack if possible
+                if (target.type == ActorTarget.TargetType.Actor && TargetInReach() && action != null)
+                {
+                    TakeAction(target.otherActor);
+                    return;
+                }
 
-				StopMovement();
-				return;
-			}
+                StopMovement();
+                return;
+            }
 
-			// Get target direction
-			Vector2 targetLocation = target.GetCurrentTargetLocation();
+            // Get target direction
+            Vector2 targetLocation = target.GetCurrentTargetLocation();
 
-			Vector2 moveDirection = Utilities2D.GetNormalizedDirection(position2D, targetLocation);
+            Vector2 moveDirection = Utilities2D.GetNormalizedDirection(position2D, targetLocation);
 
-			Move(moveDirection);
+            Move(moveDirection);
 
-			// Update look direction
-			SetLookDirectionToTarget(targetLocation);
-		}
+            // Update look direction
+            SetLookDirectionToTarget(targetLocation);
+        }
 
-		// Hack; should not be necessary to double check this
-		private bool TargetInReach()
-		{
-			Vector2 direction = position2D - target.otherActor.position2D;
-			return direction.magnitude <= action.range;
-		}
+        // Hack; should not be necessary to double check this
+        private bool TargetInReach()
+        {
+            Vector2 direction = position2D - target.otherActor.position2D;
+            return direction.magnitude <= action.range;
+        }
 
-		/// <summary>
-		/// Handles Movement of actor, change this to fit your movement needs
-		/// </summary>
-		/// <param name="moveDirection"></param>
-		private void Move(Vector2 moveDirection)
-		{
-			// Movement
-			Vector2 movement = moveDirection * movementSpeed;
-			movement.y *= verticalMovementDampening;
-			_rigidbody2D.velocity = movement;
+        /// <summary>
+        /// Handles the movement of the actor based on the provided move direction.
+        /// </summary>
+        /// <param name="moveDirection">The direction in which the actor should move.</param>
+        private void Move(Vector2 moveDirection)
+        {
+            // Movement
+            Vector2 movement = moveDirection * movementSpeed;
+            movement.y *= verticalMovementDampening;
+            _rigidbody2D.velocity = movement;
 
-			// Mark controller as moving or not (for animations)
-			if (movement.magnitude > MINIMUM_MOVEMENT_FOR_ANIMATIONS)
-			{
-				lookDirection = movement;
-				isMoving = true;
-			}
-			else { isMoving = false; }
+            // Mark controller as moving or not (for animations)
+            if (movement.magnitude > MINIMUM_MOVEMENT_FOR_ANIMATIONS)
+            {
+                lookDirection = movement;
+                isMoving = true;
+            }
+            else { isMoving = false; }
 
             // Save movement value to calculate future position for targeting this Actor
-            _lastMovement = movement; 
-		}
+            _lastMovement = movement;
+        }
 
-		private Vector2 EstimateFuturePosition(float time)
-		{
-			Vector2 futurePos = position2D;
+        /// <summary>
+        /// Estimates the future position of the actor based on the provided time.
+        /// </summary>
+        /// <param name="time">The time in seconds to estimate the future position.</param>
+        /// <returns>The estimated future position of the actor.</returns>
+        private Vector2 EstimateFuturePosition(float time)
+        {
+            Vector2 futurePos = position2D;
 
-			if (isAlive && isMoving)
-			{
-				Vector2 direction = _lastMovement.normalized;
+            if (isAlive && isMoving)
+            {
+                Vector2 direction = _lastMovement.normalized;
 
-				if (target.hasTarget)
-				{
-					direction = Utilities2D.GetNormalizedDirection(futurePos, target.GetFinalTargetPosition());
-				}
+                if (target.hasTarget) { direction = Utilities2D.GetNormalizedDirection(futurePos, target.GetFinalTargetPosition()); }
 
-				futurePos = futurePos + direction * time * movementSpeed;
-			}
+                futurePos = futurePos + direction * time * movementSpeed;
+            }
 
-			return futurePos;
-		}
+            return futurePos;
+        }
 
-		private void Die()
-		{
-			// Reset hit display
-			HideDamageDisplay();
+        /// <summary>
+        /// Handles the death of the actor, triggers necessary actions, and initiates destruction if required.
+        /// </summary>
+        private void Die()
+        {
+            // Reset hit display
+            HideDamageDisplay();
 
-			state = ActorState.Dead;
+            state = ActorState.Dead;
 
-			deathExecutionHandler();
-		}
+            deathExecutionHandler();
+        }
 
-		private void DestroyAtDeath()
-		{
-			if (_animationController != null)
-				_animationController.FadeOutAfterDeath();
+        /// <summary>
+        /// Initiates destruction of the actor after a specified time when it dies.
+        /// </summary>
+        private void DestroyAtDeath()
+        {
+            if (_animationController != null) { _animationController.FadeOutAfterDeath(); }
 
-			// Disable components
-			if (_collider2D != null)
-				_collider2D.enabled = false;
+            // Disable components
+            if (_collider2D != null) { _collider2D.enabled = false; }
 
             // Deathtime
-            float timeUntilDestroy = TIME_UNTIL_DESTRUCTION; 
+            float timeUntilDestroy = TIME_UNTIL_DESTRUCTION;
 
-			if (_isInactiveInObjectPool)
-			{
-				StartCoroutine(WaitAndDisable(timeUntilDestroy));
-			}
-			else
-				Destroy(gameObject, timeUntilDestroy);
-		}
+            if (_isInactiveInObjectPool) { StartCoroutine(WaitAndDisable(timeUntilDestroy)); }
+            else { Destroy(gameObject, timeUntilDestroy); }
+        }
 
-		private IEnumerator WaitAndDisable(float time)
-		{
-			yield return new WaitForSeconds(time);
-			Disable();
-		}
+        /// <summary>
+        /// Waits for a specified time and then disables the actor.
+        /// </summary>
+        /// <param name="time">The time in seconds to wait before disabling the actor.</param>
+        /// <returns>An IEnumerator for use in a Coroutine.</returns>
+        private IEnumerator WaitAndDisable(float time)
+        {
+            yield return new WaitForSeconds(time);
+            Disable();
+        }
 
-		#endregion
+        #endregion
 
-		#region Display
+        #region Display
 
-		public void SetHorizontalDisplayDirection(bool toTheRight)
-		{
-			if (toTheRight != directionRight) { FlipDirection(); }
-		}
+        /// <summary>
+        /// Sets the horizontal display direction of the actor based on whether it should face right or left.
+        /// </summary>
+        /// <param name="toTheRight">Indicates whether the actor should face right (true) or left (false).</param>
+        public void SetHorizontalDisplayDirection(bool toTheRight)
+        {
+            if (toTheRight != directionRight) { FlipDirection(); }
+        }
 
-		public void SetLookDirection(Vector2 direction)
-		{
-			lookDirection = direction;
-			if (direction.x > 0) { SetHorizontalDisplayDirection(true); }
-			else if (direction.x < 0) { SetHorizontalDisplayDirection(false); }
-		}
+        /// <summary>
+        /// Sets the look direction of the actor.
+        /// </summary>
+        /// <param name="direction">The direction to set as the look direction.</param>
+        public void SetLookDirection(Vector2 direction)
+        {
+            lookDirection = direction;
+            if (direction.x > 0) { SetHorizontalDisplayDirection(true); }
+            else if (direction.x < 0) { SetHorizontalDisplayDirection(false); }
+        }
 
-		private void SetLookDirectionToTarget(Vector2 targetLocation)
-		{
-			SetLookDirection(targetLocation - position2D);
-		}
+        /// <summary>
+        /// Sets the look direction of the actor towards a target location.
+        /// </summary>
+        /// <param name="targetLocation">The target location to set as the look direction.</param>
+        private void SetLookDirectionToTarget(Vector2 targetLocation)
+        {
+            SetLookDirection(targetLocation - position2D);
+        }
 
-		private void FlipDirection()
-		{
-			directionRight = !directionRight;
+        /// <summary>
+        /// Flips the direction of the actor, changing its visual avatar's orientation.
+        /// </summary>
+        private void FlipDirection()
+        {
+            directionRight = !directionRight;
 
-			if (!canFlip) { return; }
+            if (!canFlip) { return; }
 
-			// Change visual avatar
-			if (displayObject != null)
-			{
-				Transform displayTransform = displayObject.transform;
-				displayTransform.localScale = new Vector3(displayTransform.localScale.x * -1.0f, displayTransform.localScale.y, displayTransform.localScale.z);
-			}
-		}
+            // Change visual avatar
+            if (displayObject != null)
+            {
+                Transform displayTransform = displayObject.transform;
+                displayTransform.localScale = new Vector3(displayTransform.localScale.x * -1.0f, displayTransform.localScale.y, displayTransform.localScale.z);
+            }
+        }
 
-		private void ShowDamageDisplay(float time, Color color)
-		{
-			_hitTimer = new Timer(time);
+        /// <summary>
+        /// Displays the damage taken by the actor for a specified time and color.
+        /// </summary>
+        /// <param name="time">The time in seconds to display the damage.</param>
+        /// <param name="color">The color of the damage display.</param>
+        private void ShowDamageDisplay(float time, Color color)
+        {
+            _hitTimer = new Timer(time);
 
-			if (_animationController != null) { _animationController.SetMaterialColor(color); }	
-		}
+            if (_animationController != null) { _animationController.SetMaterialColor(color); }
+        }
 
-		private void HideDamageDisplay()
-		{
-			if (_hitTimer != null)
-			{
-				_hitTimer = null;
+        /// <summary>
+        /// Hides the damage display, resetting the material color to its original state.
+        /// </summary>
+        private void HideDamageDisplay()
+        {
+            if (_hitTimer != null)
+            {
+                _hitTimer = null;
 
-				if (_animationController != null) { _animationController.SetMaterialColor(_originalColor); }	
-			}
-		}
+                if (_animationController != null) { _animationController.SetMaterialColor(_originalColor); }
+            }
+        }
 
         #endregion
 
@@ -683,22 +863,29 @@ namespace egads.system.actors
         {
             get { return _isInactiveInObjectPool; }
             set { _isInactiveInObjectPool = value; }
-
         }
 
+        /// <summary>
+        /// Activates the actor, resetting its state to default.
+        /// </summary>
         public void ToggleOn()
-		{
-			gameObject.SetActive(true);
-			Reset();
-		}
+        {
+            gameObject.SetActive(true);
+            Reset();
+        }
 
-		public void ToggleOff()
-		{
-			StopAllCoroutines();
-			Disable();
-			gameObject.SetActive(false);
-		}
+        /// <summary>
+        /// Deactivates the actor, stopping all coroutines and disabling its components.
+        /// </summary>
+        public void ToggleOff()
+        {
+            StopAllCoroutines();
+            Disable();
+            gameObject.SetActive(false);
+        }
 
         #endregion
+
     }
 }
+

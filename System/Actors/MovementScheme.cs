@@ -1,13 +1,18 @@
-﻿
-namespace egads.system.actors
+﻿namespace egads.system.actors
 {
-    #region Movement Mode
-
+    /// <summary>
+    /// Represents different movement schemes for actors.
+    /// </summary>
     public enum MovementScheme
-	{
-		Direct,
-		Automatic
-	}
+    {
+        /// <summary>
+        /// Movement mode where the actor's movement is controlled directly.
+        /// </summary>
+        Direct,
 
-    #endregion
+        /// <summary>
+        /// Movement mode where the actor's movement is automatic or AI-controlled.
+        /// </summary>
+        Automatic
+    }
 }
