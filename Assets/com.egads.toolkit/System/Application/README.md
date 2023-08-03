@@ -15,13 +15,13 @@ The `ApplicationInfo` class contains information about the application's setting
 This class represents the application information and settings. It contains the following public properties and methods:
 
 #### Public Properties
-- `hasTwoMouseButtons` (bool): Indicates whether the device has two mouse buttons (e.g., right-click and left-click).
-- `useTwoMouseButtons` (bool): Indicates whether the application uses two mouse buttons for input.
-- `hasTouch` (bool): Indicates whether the device supports touch input.
-- `hasMouse` (bool): Indicates whether the device supports mouse input.
+- `hasTwoMouseButtons`: Indicates whether the device has two mouse buttons (e.g., right-click and left-click).
+- `useTwoMouseButtons`: Indicates whether the application uses two mouse buttons for input.
+- `hasTouch`: Indicates whether the device supports touch input.
+- `hasMouse`: Indicates whether the device supports mouse input.
 
 #### Gamepad Setup
-- `usesGamepad` (bool, read-only): Checks if the application uses a gamepad for input. This property returns `true` if any joystick is connected.
+- `usesGamepad`: Checks if the application uses a gamepad for input. This property returns `true` if any joystick is connected.
 
 #### Constructor
 - `ApplicationInfo()`: Initializes a new instance of the `ApplicationInfo` class and sets the platform-specific settings. It also loads input settings from `PlayerPrefs`, and in Unity editor, it may override some settings based on debug flags.
