@@ -3,10 +3,16 @@ using egads.system.actors;
 
 namespace egads.system.audio
 {
-	public class SteppingSound : MonoBehaviour
-	{
+    /// <summary>
+    /// Plays stepping sounds when the associated Actor2D is moving.
+    /// </summary>
+    public class SteppingSound : MonoBehaviour
+    {
         #region Public Properties
 
+        /// <summary>
+        /// The AudioSource used to play the stepping sounds.
+        /// </summary>
         public AudioSource source;
 
         #endregion
@@ -20,26 +26,32 @@ namespace egads.system.audio
         #region Unity Methods
 
         private void Awake()
-		{
-			if (source == null) { source = GetComponent<AudioSource>(); }
+        {
+            // If the AudioSource is not set, try to get it from the GameObject
+            if (source == null) { source = GetComponent<AudioSource>(); }
 
-			_actor = GetComponent<Actor2D>();
+            // Get the associated Actor2D component
+            _actor = GetComponent<Actor2D>();
 
-			source.loop = true;
-			source.Stop();
-		}
+            // Configure the AudioSource properties
+            source.loop = true;
+            source.Stop();
+        }
 
-		private void Update()
-		{
-			if (_actor.isMoving)
-			{
-				if (!source.isPlaying) { source.Play(); }
-			}
-			else
-			{
-				if (source.isPlaying) { source.Stop(); }
-			}
-		}
+        private void Update()
+        {
+            // Check if the associated Actor2D is moving
+            if (_actor.isMoving)
+            {
+                // If the Actor is moving and the sound is not playing, start playing it
+                if (!source.isPlaying) { source.Play(); }
+            }
+            else
+            {
+                // If the Actor is not moving and the sound is playing, stop it
+                if (source.isPlaying) { source.Stop(); }
+            }
+        }
 
         #endregion
     }
