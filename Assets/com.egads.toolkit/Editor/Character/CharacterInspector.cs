@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     [CustomEditor(typeof(Character2D))]
-    public class ActorInspector : Editor
+    public class CharacterInspector : Editor
     {
         #region Public Methods
 

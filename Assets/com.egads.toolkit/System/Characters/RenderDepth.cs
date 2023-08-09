@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Component that updates the rendering depth of a GameObject based on its position in the scene.

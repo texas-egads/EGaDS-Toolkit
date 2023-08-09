@@ -2,7 +2,7 @@
 using egads.tools.utils;
 using egads.system.pathFinding;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Represents a target for an Actor2D to follow, such as a position, another Actor, or a Transform.
@@ -38,7 +38,7 @@ namespace egads.system.actors
             /// <summary>
             /// The target is another Actor2D.
             /// </summary>
-            Actor,
+            Character,
 
             /// <summary>
             /// There is no target.
@@ -99,7 +99,7 @@ namespace egads.system.actors
         /// <summary>
         /// Gets a value indicating whether the Actor's target is another Actor.
         /// </summary>
-        public bool hasActorTarget => type == TargetType.Actor;
+        public bool hasCharacterTarget => type == TargetType.Character;
 
         #endregion
 
@@ -121,12 +121,12 @@ namespace egads.system.actors
         private Transform _targetTransform;
 
         // The other Actor2D target (used when the target type is Actor).
-        private Character2D _otherActor;
+        private Character2D _otherCharacter;
 
         /// <summary>
         /// Gets the other Actor2D target when the target type is Actor.
         /// </summary>
-        public Character2D otherActor => _otherActor;
+        public Character2D otherCharacter => _otherCharacter;
 
         // Saving squared value of target reached distance for performance reasons when comparing vector length.
         private float _targetReachedDistanceSquared;
@@ -197,7 +197,7 @@ namespace egads.system.actors
         public void Update()
         {
             // Make sure we don't follow a null target Actor.
-            if (type == TargetType.Actor && _otherActor == null)
+            if (type == TargetType.Character && _otherCharacter == null)
             {
                 DisableTarget();
                 return;
@@ -238,7 +238,7 @@ namespace egads.system.actors
         {
             Vector2 targetPos = _targetPosition;
 
-            if (type == TargetType.Transform || type == TargetType.Actor) { targetPos = _targetTransform.position; }
+            if (type == TargetType.Transform || type == TargetType.Character) { targetPos = _targetTransform.position; }
 
             return targetPos;
         }
@@ -301,24 +301,24 @@ namespace egads.system.actors
         /// <param name="otherActor">The other Actor2D target to follow.</param>
         /// <param name="targetDistance">The distance at which the Actor2D is considered to have reached the target.</param>
         /// <param name="newDetermination">Optional. If true, this setting will override the previous one.</param>
-        public void SetTarget(Character2D otherActor, float targetDistance, bool newDetermination = false)
+        public void SetTarget(Character2D otherCharacter, float targetDistance, bool newDetermination = false)
         {
             if (_determined == true && newDetermination == false) { return; }
             _determined = newDetermination;
 
             DisableTarget();
 
-            if (otherActor == null) { return; }
+            if (otherCharacter == null) { return; }
 
-            type = TargetType.Actor;
-            _otherActor = otherActor;
-            _targetTransform = otherActor.transform;
+            type = TargetType.Character;
+            _otherCharacter = otherCharacter;
+            _targetTransform = otherCharacter.transform;
             targetReachedDistance = targetDistance;
             _isReached = false;
             _determined = newDetermination;
 
             // Subscribe to the stateChanged event of the otherActor to handle its state changes.
-            _otherActor.stateChanged += Actor_StateChanged;
+            _otherCharacter.stateChanged += Actor_StateChanged;
 
             _calculatePathAtNextPossibility = true;
         }
@@ -330,11 +330,11 @@ namespace egads.system.actors
         {
             type = TargetType.None;
 
-            if (_otherActor != null)
+            if (_otherCharacter != null)
             {
                 // Unsubscribe from the stateChanged event to avoid memory leaks.
-                _otherActor.stateChanged -= Actor_StateChanged;
-                _otherActor = null;
+                _otherCharacter.stateChanged -= Actor_StateChanged;
+                _otherCharacter = null;
             }
             _targetTransform = null;
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Represents an energy system with current and maximum energy values and various utility methods.

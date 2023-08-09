@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     #region Delegates
 

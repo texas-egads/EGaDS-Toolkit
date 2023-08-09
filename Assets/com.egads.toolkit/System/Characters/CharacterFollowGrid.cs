@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using egads.system.pathFinding;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// A class that enables an actor to follow a grid-based path.

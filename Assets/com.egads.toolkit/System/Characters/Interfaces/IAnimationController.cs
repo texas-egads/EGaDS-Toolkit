@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Interface representing an animation controller for an actor in the game.

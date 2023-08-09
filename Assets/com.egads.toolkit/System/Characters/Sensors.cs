@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Component that detects and tracks other actors within its 2D trigger collider and raises events for detected and lost actors.
@@ -32,12 +32,12 @@ namespace egads.system.actors
         /// <summary>
         /// List of actors detected by the sensor.
         /// </summary>
-        public List<Character2D> actors = new List<Character2D>();
+        public List<Character2D> characters = new List<Character2D>();
 
         /// <summary>
         /// Gets a value indicating whether the sensor has detected any actors.
         /// </summary>
-        public bool ActorsDetected => actors.Count > 0;
+        public bool hasCharactersDetected => characters.Count > 0;
 
         #endregion
 
@@ -66,15 +66,15 @@ namespace egads.system.actors
             if (other.tag == Tag)
             {
                 Character2D actor = other.GetComponent<Character2D>();
-                if (actor != null && !actors.Contains(actor) && actor.isAlive)
+                if (actor != null && !characters.Contains(actor) && actor.isAlive)
                 {
-                    actors.Add(actor);
+                    characters.Add(actor);
 
                     // Subscribe to the actor's stateChanged event to handle changes in actor state.
                     actor.stateChanged += Actor_StateChanged;
 
                     // Raise the sensor event for actor detection.
-                    if (sensorEvent != null) { sensorEvent(SensorEvent.ActorDetected, actor); }
+                    if (sensorEvent != null) { sensorEvent(SensorEvent.CharacterDetected, actor); }
                 }
             }
         }
@@ -100,22 +100,22 @@ namespace egads.system.actors
         /// Gets the most wounded actor from the detected actors list.
         /// </summary>
         /// <returns>The most wounded actor, or null if no actors are detected.</returns>
-        public Character2D GetMostWoundedActor()
+        public Character2D GetMostWoundedCharacter()
         {
             UpdateList();
 
-            if (actors.Count == 0) { return null; }
+            if (characters.Count == 0) { return null; }
 
-            Character2D targetActor = actors[0];
+            Character2D targetActor = characters[0];
             float woundAmount = targetActor.health.missingAmount;
 
-            for (int i = 1; i < actors.Count; i++)
+            for (int i = 1; i < characters.Count; i++)
             {
-                float newHealthAmount = actors[i].health.missingAmount;
+                float newHealthAmount = characters[i].health.missingAmount;
                 if (newHealthAmount > woundAmount)
                 {
                     woundAmount = newHealthAmount;
-                    targetActor = actors[i];
+                    targetActor = characters[i];
                 }
             }
 
@@ -126,23 +126,23 @@ namespace egads.system.actors
         /// Gets the nearest actor from the detected actors list.
         /// </summary>
         /// <returns>The nearest actor, or null if no actors are detected.</returns>
-        public Character2D GetNearestActor()
+        public Character2D GetNearestCharacter()
         {
             UpdateList();
 
-            if (actors.Count == 0) { return null; }
+            if (characters.Count == 0) { return null; }
 
             Vector2 position = _transform.position;
-            Character2D nearestActor = actors[0];
+            Character2D nearestActor = characters[0];
             float foundDistance = (position - nearestActor.position2D).sqrMagnitude;
 
-            for (int i = 1; i < actors.Count; i++)
+            for (int i = 1; i < characters.Count; i++)
             {
-                float newDistance = (position - actors[i].position2D).sqrMagnitude;
+                float newDistance = (position - characters[i].position2D).sqrMagnitude;
                 if (newDistance < foundDistance)
                 {
                     foundDistance = newDistance;
-                    nearestActor = actors[i];
+                    nearestActor = characters[i];
                 }
             }
 
@@ -170,15 +170,15 @@ namespace egads.system.actors
         /// </summary>
         private void RemoveActor(Character2D actor)
         {
-            if (actor != null && actors.Contains(actor))
+            if (actor != null && characters.Contains(actor))
             {
-                actors.Remove(actor);
+                characters.Remove(actor);
 
                 // Unsubscribe from the actor's stateChanged event.
                 actor.stateChanged -= Actor_StateChanged;
 
                 // Raise the sensor event for actor leaving.
-                if (sensorEvent != null) { sensorEvent(SensorEvent.ActorLeft, actor); }
+                if (sensorEvent != null) { sensorEvent(SensorEvent.CharacterLeft, actor); }
             }
         }
 
@@ -187,11 +187,11 @@ namespace egads.system.actors
         /// </summary>
         private void UpdateList()
         {
-            for (int i = 0; i < actors.Count; i++)
+            for (int i = 0; i < characters.Count; i++)
             {
-                if (actors[i] == null)
+                if (characters[i] == null)
                 {
-                    actors.RemoveAt(i);
+                    characters.RemoveAt(i);
                     i--;
                 }
             }

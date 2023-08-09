@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Component that detects and tracks other actors within its 2D trigger collider and raises events for detected and lost actors.
@@ -33,12 +33,12 @@ namespace egads.system.actors
         /// <summary>
         /// List of actors detected by the sensor.
         /// </summary>
-        public List<ICharacter> actors = new List<ICharacter>();
+        public List<ICharacter> characters = new List<ICharacter>();
 
         /// <summary>
         /// Gets a value indicating whether the sensor has detected any actors.
         /// </summary>
-        public bool hasActorsDetected => actors.Count > 0;
+        public bool hasCharactersDetected => characters.Count > 0;
 
         #endregion
 
@@ -74,15 +74,15 @@ namespace egads.system.actors
             if (searchTag == "" || other.tag == searchTag)
             {
                 ICharacter actor = other.transform.GetInterface<ICharacter>();
-                if (actor != null && actor != _self && !actors.Contains(actor) && actor.isAlive)
+                if (actor != null && actor != _self && !characters.Contains(actor) && actor.isAlive)
                 {
-                    actors.Add(actor);
+                    characters.Add(actor);
 
                     // Subscribe to the actor's stateChanged event to handle changes in actor state.
                     actor.stateChanged += Actor_StateChanged;
 
                     // Raise the sensor event for actor detection.
-                    if (sensorEvent != null) { sensorEvent(SensorEvent.ActorDetected, actor); }
+                    if (sensorEvent != null) { sensorEvent(SensorEvent.CharacterDetected, actor); }
                 }
             }
         }
@@ -112,7 +112,7 @@ namespace egads.system.actors
         {
             if (!actor.isAlive)
             {
-                if (actors.Contains(actor))
+                if (characters.Contains(actor))
                 {
                     Remove(actor);
                 }
@@ -129,16 +129,16 @@ namespace egads.system.actors
         /// </summary>
         private void Remove(ICharacter actor)
         {
-            if (actor != null && actors.Contains(actor))
+            if (actor != null && characters.Contains(actor))
             {
-                actors.Remove(actor);
+                characters.Remove(actor);
 
                 // Unsubscribe from the actor's stateChanged event.
                 actor.stateChanged -= Actor_StateChanged;
 
                 // Raise the sensor event for actor leaving.
                 if (sensorEvent != null)
-                    sensorEvent(SensorEvent.ActorLeft, actor);
+                    sensorEvent(SensorEvent.CharacterLeft, actor);
             }
         }
 
@@ -147,11 +147,11 @@ namespace egads.system.actors
         /// </summary>
         private void UpdateList()
         {
-            for (int i = 0; i < actors.Count; i++)
+            for (int i = 0; i < characters.Count; i++)
             {
-                if (actors[i] == null)
+                if (characters[i] == null)
                 {
-                    actors.RemoveAt(i);
+                    characters.RemoveAt(i);
                     i--;
                 }
             }

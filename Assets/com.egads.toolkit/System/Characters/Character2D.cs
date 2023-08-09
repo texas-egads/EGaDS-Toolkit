@@ -7,7 +7,7 @@ using egads.system.actions;
 using egads.system.timer;
 using egads.system.gameManagement;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// A 2D actor class that implements IPooledObject, IActor, and IHasHealth interfaces.
@@ -507,11 +507,11 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="otherActor">The other actor to set as the target.</param>
         /// <param name="determined">Indicates whether the actor's movement is determined or not (default is false).</param>
-        public void SetTarget(Character2D otherActor, bool determined = false)
+        public void SetTarget(Character2D otherCharacter, bool determined = false)
         {
             if (!isAlive) { return; }
 
-            if (action != null) { target.SetTarget(otherActor, action.range * 0.9f, determined); }
+            if (action != null) { target.SetTarget(otherCharacter, action.range * 0.9f, determined); }
 
             if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
@@ -583,7 +583,7 @@ namespace egads.system.actors
         /// Initiates the actor to take an action on a target actor, such as attacking or using a skill.
         /// </summary>
         /// <param name="targetActor">The target actor on which the action will be performed.</param>
-        public void TakeAction(Character2D targetActor)
+        public void TakeAction(Character2D targetCharacter)
         {
             if (!isAlive) { return; }
 
@@ -591,7 +591,7 @@ namespace egads.system.actors
             isMoving = false;
 
             // Update look direction
-            SetLookDirectionToTarget(targetActor.position2D);
+            SetLookDirectionToTarget(targetCharacter.position2D);
 
             state = CharacterState.TakingAction;
 
@@ -663,9 +663,9 @@ namespace egads.system.actors
             if (target.isReached)
             {
                 // Attack if possible
-                if (target.type == CharacterTarget.TargetType.Actor && TargetInReach() && action != null)
+                if (target.type == CharacterTarget.TargetType.Character && TargetInReach() && action != null)
                 {
-                    TakeAction(target.otherActor);
+                    TakeAction(target.otherCharacter);
                     return;
                 }
 
@@ -687,7 +687,7 @@ namespace egads.system.actors
         // Hack; should not be necessary to double check this
         private bool TargetInReach()
         {
-            Vector2 direction = position2D - target.otherActor.position2D;
+            Vector2 direction = position2D - target.otherCharacter.position2D;
             return direction.magnitude <= action.range;
         }
 
