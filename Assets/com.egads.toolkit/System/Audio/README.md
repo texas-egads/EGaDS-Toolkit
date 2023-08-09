@@ -51,7 +51,7 @@ Public Properties
 
 ### SteppingSound
 
-Plays stepping sounds when the associated Actor2D is moving.
+Plays stepping sounds when the associated Character2D is moving.
 
 Public Properties
 - `source`: The AudioSource used to play the stepping sounds.
@@ -74,4 +74,4 @@ Below are some usage instructions for each class:
 
 ### SteppingSound
 - Attach the `SteppingSound` script to a character `GameObject` with an `AudioSource` component
-- The associated `Actor2D` script should handle the movement logic
+- The associated `Character2D` script should handle the movement logic
