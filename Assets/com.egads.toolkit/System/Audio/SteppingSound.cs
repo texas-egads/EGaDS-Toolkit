@@ -19,7 +19,7 @@ namespace egads.system.audio
 
         #region Private Properties
 
-        private Actor2D _actor;
+        private Character2D _actor;
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace egads.system.audio
             if (source == null) { source = GetComponent<AudioSource>(); }
 
             // Get the associated Actor2D component
-            _actor = GetComponent<Actor2D>();
+            _actor = GetComponent<Character2D>();
 
             // Configure the AudioSource properties
             source.loop = true;
