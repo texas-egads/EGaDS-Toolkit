@@ -26,7 +26,7 @@ namespace egads.system.actors
         /// </summary>
         private void Awake()
         {
-            Actor2D actor = GetComponent<Actor2D>();
+            Character2D actor = GetComponent<Character2D>();
             // Add a random value to the actor's movement speed based on the multiplier.
             actor.movementSpeed += UnityEngine.Random.Range(1f, multiplier);
         }

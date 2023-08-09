@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace egads.system.actors
 {
-    [CustomEditor(typeof(Actor2D))]
+    [CustomEditor(typeof(Character2D))]
     public class ActorInspector : Editor
     {
         #region Public Methods
@@ -32,13 +32,13 @@ namespace egads.system.actors
 
         private void KillCharacter()
         {
-            Actor2D actor = target as Actor2D;
+            Character2D actor = target as Character2D;
             actor.Kill();
         }
 
         private void DamageCharacter()
         {
-            Actor2D actor = target as Actor2D;
+            Character2D actor = target as Character2D;
             actor.ApplyDamage(2f);
         }
 

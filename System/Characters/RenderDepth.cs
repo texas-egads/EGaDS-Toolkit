@@ -5,7 +5,7 @@ namespace egads.system.actors
     /// <summary>
     /// Component that updates the rendering depth of a GameObject based on its position in the scene.
     /// </summary>
-    public class RenderDepthUpdate : MonoBehaviour
+    public class RenderDepth : MonoBehaviour
     {
         #region Public Properties
 
@@ -27,7 +27,7 @@ namespace egads.system.actors
         private bool _isActive = true;
 
         private Transform _transform;
-        private Actor2D _actor;
+        private Character2D _actor;
 
         #endregion
 
@@ -40,7 +40,7 @@ namespace egads.system.actors
         {
             _transform = transform;
 
-            _actor = GetComponent<Actor2D>();
+            _actor = GetComponent<Character2D>();
             if (_actor != null)
             {
                 // Subscribe to the actor's stateChanged event to handle changes in actor state.
@@ -78,7 +78,7 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="activeActor">The actor that changed state.</param>
         /// <param name="state">The new state of the actor.</param>
-        private void ActorStateChanged(IActor activeActor, ActorState state)
+        private void ActorStateChanged(ICharacter activeActor, CharacterState state)
         {
             // Reset depth rendering when actor is active again after being dead.
             if (activeActor.isAlive && !_isActive)

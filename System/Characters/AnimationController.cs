@@ -64,7 +64,7 @@ namespace egads.system.actors
         #region Private Properties
 
         // Reference to the Actor2D component attached to this GameObject.
-        private Actor2D _actor;
+        private Character2D _actor;
 
         // Reference to the Animator component for playing animations.
         private Animator _animator;
@@ -89,7 +89,7 @@ namespace egads.system.actors
         private void Awake()
         {
             // Get the Actor2D component attached to this GameObject.
-            _actor = GetComponent<Actor2D>(); 
+            _actor = GetComponent<Character2D>(); 
             if (_actor != null) { _actor.stateChanged += ActorStateChangedHandler; }
 
             if (displayObject != null) { _animator = displayObject.GetComponentInChildren<Animator>(); }
@@ -187,7 +187,7 @@ namespace egads.system.actors
             if (_fadeOutTimer == null)
             {
                 ClearFading();
-                _fadeOutTimer = new FadingTimer(0, Actor2D.TIME_UNTIL_DESTRUCTION, 2.0f);
+                _fadeOutTimer = new FadingTimer(0, Character2D.TIME_UNTIL_DESTRUCTION, 2.0f);
             }
         }
 
@@ -250,12 +250,12 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="activeActor">The active actor implementing the IActor interface.</param>
         /// <param name="state">The new state of the actor.</param>
-        private void ActorStateChangedHandler(IActor activeActor, ActorState state)
+        private void ActorStateChangedHandler(ICharacter activeActor, CharacterState state)
         {
-            if (state == ActorState.Dead) { SetAnimation(AvatarAnimation.die); }
-            else if (state == ActorState.TakingAction) { SetAnimation(AvatarAnimation.attack); }
-            else if (state == ActorState.Moving) { SetAnimation(AvatarAnimation.walk); }
-            else if (state == ActorState.Idle) { SetAnimation(AvatarAnimation.idle); }
+            if (state == CharacterState.Dead) { SetAnimation(AvatarAnimation.die); }
+            else if (state == CharacterState.TakingAction) { SetAnimation(AvatarAnimation.attack); }
+            else if (state == CharacterState.Moving) { SetAnimation(AvatarAnimation.walk); }
+            else if (state == CharacterState.Idle) { SetAnimation(AvatarAnimation.idle); }
         }
 
         /// <summary>

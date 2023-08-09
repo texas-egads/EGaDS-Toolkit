@@ -18,7 +18,7 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="type">The type of sensor event.</param>
         /// <param name="actor">The detected or lost actor.</param>
-        public delegate void SensorEventDelegate(SensorEvent type, IActor actor);
+        public delegate void SensorEventDelegate(SensorEvent type, ICharacter actor);
         public event SensorEventDelegate sensorEvent;
 
         #endregion
@@ -33,7 +33,7 @@ namespace egads.system.actors
         /// <summary>
         /// List of actors detected by the sensor.
         /// </summary>
-        public List<IActor> actors = new List<IActor>();
+        public List<ICharacter> actors = new List<ICharacter>();
 
         /// <summary>
         /// Gets a value indicating whether the sensor has detected any actors.
@@ -45,7 +45,7 @@ namespace egads.system.actors
         #region Private Properties
 
         protected Transform _transform;
-        protected IActor _self;
+        protected ICharacter _self;
 
         #endregion
 
@@ -58,10 +58,10 @@ namespace egads.system.actors
         {
             _transform = transform;
 
-            _self = _transform.GetInterface<IActor>();
+            _self = _transform.GetInterface<ICharacter>();
             if (_self == null && _transform.parent != null)
             {
-                _self = _transform.parent.GetInterface<IActor>();
+                _self = _transform.parent.GetInterface<ICharacter>();
             }
         }
 
@@ -73,7 +73,7 @@ namespace egads.system.actors
         {
             if (searchTag == "" || other.tag == searchTag)
             {
-                IActor actor = other.transform.GetInterface<IActor>();
+                ICharacter actor = other.transform.GetInterface<ICharacter>();
                 if (actor != null && actor != _self && !actors.Contains(actor) && actor.isAlive)
                 {
                     actors.Add(actor);
@@ -95,7 +95,7 @@ namespace egads.system.actors
         {
             if (searchTag == "" || other.tag == searchTag)
             {
-                IActor actor = other.transform.GetInterface<IActor>();
+                ICharacter actor = other.transform.GetInterface<ICharacter>();
                 Remove(actor);
             }
         }
@@ -108,7 +108,7 @@ namespace egads.system.actors
         /// Event handler for the actor's stateChanged event.
         /// Handles the removal of actors when they become inactive (dead).
         /// </summary>
-        private void Actor_StateChanged(IActor actor, ActorState state)
+        private void Actor_StateChanged(ICharacter actor, CharacterState state)
         {
             if (!actor.isAlive)
             {
@@ -127,7 +127,7 @@ namespace egads.system.actors
         /// <summary>
         /// Removes the specified actor from the detected list and raises the sensor event accordingly.
         /// </summary>
-        private void Remove(IActor actor)
+        private void Remove(ICharacter actor)
         {
             if (actor != null && actors.Contains(actor))
             {
