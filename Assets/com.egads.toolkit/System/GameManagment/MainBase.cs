@@ -68,8 +68,8 @@ namespace egads.system.gameManagement
 		public static BaseNavigationInput BaseNavigationInput => Instance.baseNavigationInput;
 
 		[HideInInspector]
-        public ApplicationInfo applicationInfo;
-		public static ApplicationInfo Info => Instance.applicationInfo;
+        public AppInfo applicationInfo;
+		public static AppInfo Info => Instance.applicationInfo;
 
         [HideInInspector]
         public BaseAudioManager baseAudioManager;
@@ -259,7 +259,7 @@ namespace egads.system.gameManagement
             baseAudioManager = GetComponent<BaseAudioManager>();
 			baseNavigationInput = GetComponent<BaseNavigationInput>();
 			messenger = GetComponent<Messenger>();
-			applicationInfo = new ApplicationInfo();
+			applicationInfo = new AppInfo();
 
 			gamepadInput = transform.GetInterface<IGamepadInput>();
 			inputController = transform.GetInterface<IInputController>();

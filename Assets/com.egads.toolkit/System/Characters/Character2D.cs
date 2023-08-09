@@ -12,7 +12,7 @@ namespace egads.system.actors
     /// <summary>
     /// A 2D actor class that implements IPooledObject, IActor, and IHasHealth interfaces.
     /// </summary>
-    public class Actor2D : MonoBehaviour, IPooledObject, IActor, IHasHealth
+    public class Character2D : MonoBehaviour, IPooledObject, ICharacter, IHasHealth
 	{
         #region Constants
 
@@ -93,12 +93,12 @@ namespace egads.system.actors
         #region State
 
         [SerializeField]
-		private ActorState _state = ActorState.Idle;
+		private CharacterState _state = CharacterState.Idle;
 
         /// <summary>
         /// The current state of the actor.
         /// </summary>
-        public ActorState state
+        public CharacterState state
 		{
 			get { return _state; }
 			private set
@@ -116,7 +116,7 @@ namespace egads.system.actors
                 if (stateChanged != null) { stateChanged(this, _state); }
 
                 // Trigger the getsDisabled event if the state changes to Disabled and there are subscribers.
-                if (_state == ActorState.Disabled && getsDisabled != null) { getsDisabled(this); }
+                if (_state == CharacterState.Disabled && getsDisabled != null) { getsDisabled(this); }
 			}
 		}
 
@@ -155,7 +155,7 @@ namespace egads.system.actors
         public float verticalMovementDampening = 1f;
 
         [HideInInspector]
-        public ActorTarget target;
+        public CharacterTarget target;
 
         public Vector2 lookDirection = Vector2.zero;
 
@@ -187,17 +187,17 @@ namespace egads.system.actors
         /// <summary>
         /// Returns true if the actor is alive.
         /// </summary>
-        public bool isAlive => !(state == ActorState.Dead || state == ActorState.Disabled);
+        public bool isAlive => !(state == CharacterState.Dead || state == CharacterState.Disabled);
 
         /// <summary>
         /// Returns true if the actor is enabled (not disabled).
         /// </summary>
-        public bool isEnabled => !(state == ActorState.Disabled);
+        public bool isEnabled => !(state == CharacterState.Disabled);
 
         /// <summary>
         /// Returns true if the actor is ready to perform actions.
         /// </summary>
-        public bool isReady => (state == ActorState.Idle || state == ActorState.Moving);
+        public bool isReady => (state == CharacterState.Idle || state == CharacterState.Moving);
 
         #endregion
 
@@ -208,7 +208,7 @@ namespace egads.system.actors
         /// <summary>
         /// The timed action that this actor can perform.
         /// </summary>
-        public IActorTimedAction action;
+        public ICharacterTimedAction action;
 
         #endregion
 
@@ -278,7 +278,7 @@ namespace egads.system.actors
             _rigidbody2D = GetComponent<Rigidbody2D>();
             _collider2D = GetComponent<Collider2D>();
             _animationController = _transform.GetInterface<IAnimationController>();
-            target = new ActorTarget(this, _transform);
+            target = new CharacterTarget(this, _transform);
 
             if (_health == null) { health = new Energy(_maxHealth); }
 
@@ -325,7 +325,7 @@ namespace egads.system.actors
             }
 
             // Do nothing when dead
-            if (state == ActorState.Disabled || state == ActorState.Dead) { return; }
+            if (state == CharacterState.Disabled || state == CharacterState.Dead) { return; }
 
             // Timer for hit visuals
             if (_hitTimer != null && isAlive)
@@ -339,7 +339,7 @@ namespace egads.system.actors
             target.Update();
 
             // Update movement
-            if (state == ActorState.Moving)
+            if (state == CharacterState.Moving)
             {
                 if (!target.hasTarget)
                 {
@@ -347,7 +347,7 @@ namespace egads.system.actors
                     else
                     {
                         isMoving = false;
-                        state = ActorState.Idle;
+                        state = CharacterState.Idle;
                         return;
                     }
                 }
@@ -360,16 +360,16 @@ namespace egads.system.actors
                 _actionTimer.Update();
                 if (_actionTimer.hasEnded)
                 {
-                    state = ActorState.Idle;
+                    state = CharacterState.Idle;
                     _actionTimer = null;
                 }
                 else { return; } // Wait for actions to finish
             }
 
             // Resume actions when idle and has a target
-            if (state == ActorState.Idle && target.hasTarget)
+            if (state == CharacterState.Idle && target.hasTarget)
             {
-                state = ActorState.Moving;
+                state = CharacterState.Moving;
                 return;
             }
         }
@@ -386,7 +386,7 @@ namespace egads.system.actors
         public void MakeInactive()
         {
             target.DisableTarget();
-            state = ActorState.Disabled;
+            state = CharacterState.Disabled;
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace egads.system.actors
 
             HideDamageDisplay();
 
-            state = ActorState.Idle;
+            state = CharacterState.Idle;
         }
 
         /// <summary>
@@ -484,7 +484,7 @@ namespace egads.system.actors
 
             target.SetTarget(newTarget, distance, determined);
 
-            if (state == ActorState.Idle) { state = ActorState.Moving; }
+            if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
 
         /// <summary>
@@ -499,7 +499,7 @@ namespace egads.system.actors
 
             target.SetTarget(position, distance, determined);
 
-            if (state == ActorState.Idle) { state = ActorState.Moving; }
+            if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
 
         /// <summary>
@@ -507,13 +507,13 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="otherActor">The other actor to set as the target.</param>
         /// <param name="determined">Indicates whether the actor's movement is determined or not (default is false).</param>
-        public void SetTarget(Actor2D otherActor, bool determined = false)
+        public void SetTarget(Character2D otherActor, bool determined = false)
         {
             if (!isAlive) { return; }
 
             if (action != null) { target.SetTarget(otherActor, action.range * 0.9f, determined); }
 
-            if (state == ActorState.Idle) { state = ActorState.Moving; }
+            if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
 
         /// <summary>
@@ -542,7 +542,7 @@ namespace egads.system.actors
             if (moveDirection.x > 0) { SetHorizontalDisplayDirection(true); }
             else if (moveDirection.x < 0) { SetHorizontalDisplayDirection(false); }
 
-            if (state == ActorState.Idle) { state = ActorState.Moving; }
+            if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
 
         /// <summary>
@@ -575,7 +575,7 @@ namespace egads.system.actors
                 isMoving = false;
                 target.DisableTarget();
 
-                if (state == ActorState.Moving) { state = ActorState.Idle; }
+                if (state == CharacterState.Moving) { state = CharacterState.Idle; }
             }
         }
 
@@ -583,7 +583,7 @@ namespace egads.system.actors
         /// Initiates the actor to take an action on a target actor, such as attacking or using a skill.
         /// </summary>
         /// <param name="targetActor">The target actor on which the action will be performed.</param>
-        public void TakeAction(Actor2D targetActor)
+        public void TakeAction(Character2D targetActor)
         {
             if (!isAlive) { return; }
 
@@ -593,7 +593,7 @@ namespace egads.system.actors
             // Update look direction
             SetLookDirectionToTarget(targetActor.position2D);
 
-            state = ActorState.TakingAction;
+            state = CharacterState.TakingAction;
 
             action.Execute();
         }
@@ -605,7 +605,7 @@ namespace egads.system.actors
         public void TakeAction(IEnumeratedAction enumeratedAction)
         {
             isMoving = false;
-            state = ActorState.TakingAction;
+            state = CharacterState.TakingAction;
 
             StartCoroutine(StartAction(enumeratedAction));
         }
@@ -613,7 +613,7 @@ namespace egads.system.actors
         private IEnumerator StartAction(IEnumeratedAction enumeratedAction)
         {
             yield return StartCoroutine(enumeratedAction.Execute());
-            state = ActorState.Idle;
+            state = CharacterState.Idle;
         }
 
         #endregion
@@ -663,7 +663,7 @@ namespace egads.system.actors
             if (target.isReached)
             {
                 // Attack if possible
-                if (target.type == ActorTarget.TargetType.Actor && TargetInReach() && action != null)
+                if (target.type == CharacterTarget.TargetType.Actor && TargetInReach() && action != null)
                 {
                     TakeAction(target.otherActor);
                     return;
@@ -743,7 +743,7 @@ namespace egads.system.actors
             // Reset hit display
             HideDamageDisplay();
 
-            state = ActorState.Dead;
+            state = CharacterState.Dead;
 
             deathExecutionHandler();
         }

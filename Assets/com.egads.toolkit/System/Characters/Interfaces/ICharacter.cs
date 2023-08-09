@@ -9,14 +9,14 @@ namespace egads.system.actors
     /// </summary>
     /// <param name="actor">The <see cref="IActor"/> instance whose state is changing.</param>
     /// <param name="state">The new state of the actor.</param>
-    public delegate void StateChanged(IActor actor, ActorState state);
+    public delegate void StateChanged(ICharacter actor, CharacterState state);
 
     #endregion
 
     /// <summary>
     /// Interface representing an actor in the game.
     /// </summary>
-    public interface IActor
+    public interface ICharacter
     {
         #region Properties
 

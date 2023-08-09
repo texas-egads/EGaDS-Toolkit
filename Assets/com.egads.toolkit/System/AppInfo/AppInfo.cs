@@ -6,7 +6,7 @@ namespace egads.system.application
     /// <summary>
     /// Contains information about the application's settings and platform-specific configurations.
     /// </summary>
-    public class ApplicationInfo
+    public class AppInfo
     {
         #region Public Properties
 
@@ -58,7 +58,7 @@ namespace egads.system.application
         /// <summary>
         /// Initializes a new instance of the ApplicationInfo class and sets the platform-specific settings.
         /// </summary>
-        public ApplicationInfo()
+        public AppInfo()
         {
             SetPlatformSettings();
 

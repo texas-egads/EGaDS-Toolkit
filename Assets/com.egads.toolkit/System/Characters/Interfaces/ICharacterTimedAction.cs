@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface representing an actor's timed action in the game.
     /// </summary>
-    public interface IActorTimedAction
+    public interface ICharacterTimedAction
     {
         #region Properties
 

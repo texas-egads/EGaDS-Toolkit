@@ -7,7 +7,7 @@ namespace egads.system.actors
     /// <summary>
     /// Represents a target for an Actor2D to follow, such as a position, another Actor, or a Transform.
     /// </summary>
-    public class ActorTarget
+    public class CharacterTarget
     {
         #region Constants
 
@@ -112,7 +112,7 @@ namespace egads.system.actors
         private Transform _protagonistTransform;
 
         // The Actor2D instance who is following the target.
-        private Actor2D _protagonist;
+        private Character2D _protagonist;
 
         // The target position to follow (used when the target type is Position).
         private Vector2 _targetPosition;
@@ -121,12 +121,12 @@ namespace egads.system.actors
         private Transform _targetTransform;
 
         // The other Actor2D target (used when the target type is Actor).
-        private Actor2D _otherActor;
+        private Character2D _otherActor;
 
         /// <summary>
         /// Gets the other Actor2D target when the target type is Actor.
         /// </summary>
-        public Actor2D otherActor => _otherActor;
+        public Character2D otherActor => _otherActor;
 
         // Saving squared value of target reached distance for performance reasons when comparing vector length.
         private float _targetReachedDistanceSquared;
@@ -175,7 +175,7 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="protagonist">The Actor2D instance to be controlled by this target.</param>
         /// <param name="protagonistTransform">The Transform component of the Actor2D instance.</param>
-        public ActorTarget(Actor2D protagonist, Transform protagonistTransform)
+        public CharacterTarget(Character2D protagonist, Transform protagonistTransform)
         {
             _protagonist = protagonist;
             _protagonistTransform = protagonistTransform;
@@ -301,7 +301,7 @@ namespace egads.system.actors
         /// <param name="otherActor">The other Actor2D target to follow.</param>
         /// <param name="targetDistance">The distance at which the Actor2D is considered to have reached the target.</param>
         /// <param name="newDetermination">Optional. If true, this setting will override the previous one.</param>
-        public void SetTarget(Actor2D otherActor, float targetDistance, bool newDetermination = false)
+        public void SetTarget(Character2D otherActor, float targetDistance, bool newDetermination = false)
         {
             if (_determined == true && newDetermination == false) { return; }
             _determined = newDetermination;
@@ -437,7 +437,7 @@ namespace egads.system.actors
         /// </summary>
         /// <param name="actor">The otherActor whose state changed.</param>
         /// <param name="state">The new state of the otherActor.</param>
-        private void Actor_StateChanged(IActor actor, ActorState state)
+        private void Actor_StateChanged(ICharacter actor, CharacterState state)
         {
             // If the otherActor is no longer alive, disable the target and invoke the target event to notify listeners.
             if (!actor.isAlive)

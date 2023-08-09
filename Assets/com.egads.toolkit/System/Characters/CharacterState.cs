@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the possible states an actor can be in.
     /// </summary>
-    public enum ActorState
+    public enum CharacterState
     {
         /// <summary>
         /// The actor is idle and not performing any actions or movement.
