@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Component that adds a random speed boost to an Actor2D's movement speed upon Awake.

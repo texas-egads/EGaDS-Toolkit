@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using egads.tools.extensions;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Component that allows GameObjects to be selectable and provides settings for searching for the selectable interface in the current object or its parent/children.

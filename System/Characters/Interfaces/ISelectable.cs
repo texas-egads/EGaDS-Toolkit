@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Interface representing a selectable object in the game.

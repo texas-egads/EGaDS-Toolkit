@@ -1,4 +1,4 @@
-﻿namespace egads.system.actors
+﻿namespace egads.system.characters
 {
     /// <summary>
     /// Enumeration representing different sensor events for actors.
@@ -8,11 +8,11 @@
         /// <summary>
         /// Event indicating that an actor has been detected by the sensor.
         /// </summary>
-        ActorDetected,
+        CharacterDetected,
 
         /// <summary>
         /// Event indicating that an actor has left the sensor's detection area.
         /// </summary>
-        ActorLeft
+        CharacterLeft
     }
 }

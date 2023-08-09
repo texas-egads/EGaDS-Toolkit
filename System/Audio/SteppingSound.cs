@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using egads.system.actors;
+using egads.system.characters;
 
 namespace egads.system.audio
 {

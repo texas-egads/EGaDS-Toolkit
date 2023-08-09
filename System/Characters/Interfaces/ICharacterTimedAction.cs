@@ -1,4 +1,4 @@
-﻿namespace egads.system.actors
+﻿namespace egads.system.characters
 {
     /// <summary>
     /// Interface representing an actor's timed action in the game.

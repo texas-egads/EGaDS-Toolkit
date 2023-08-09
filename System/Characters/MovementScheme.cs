@@ -1,4 +1,4 @@
-﻿namespace egads.system.actors
+﻿namespace egads.system.characters
 {
     /// <summary>
     /// Represents different movement schemes for actors.

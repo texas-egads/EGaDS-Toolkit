@@ -1,4 +1,4 @@
-﻿namespace egads.system.actors
+﻿namespace egads.system.characters
 {
     /// <summary>
     /// Interface representing an entity that has health in the game.

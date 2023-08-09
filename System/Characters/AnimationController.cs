@@ -5,7 +5,7 @@ using egads.system.timer;
 using egads.system.gameManagement;
 using System.Xml.Linq;
 
-namespace egads.system.actors
+namespace egads.system.characters
 {
     /// <summary>
     /// Controls the animations of the actor using the Unity Animator system.

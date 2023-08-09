@@ -1,4 +1,4 @@
-﻿namespace egads.system.actors
+﻿namespace egads.system.characters
 {
     /// <summary>
     /// Enumeration representing different types of weapons.
