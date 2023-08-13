@@ -5,28 +5,28 @@ The Characters System is a collection of interfaces and classes designed to faci
 - [Overview](#overview)
 - [Interfaces](#interfaces)
   - [ICharacter](#icharacter)
-  - [ICharacterTimedAction](#icharactertimedaction)
+  - [ICharacterTimedOrder](#icharactertimedorder)
   - [IAnimationController](#ianimationcontroller)
   - [IHasHealth](#ihashealth)
   - [ISelectable](#iselectable)
 - [Classes](#classes)
+  - [AnimationController](#animationcontroller)
   - [Character2D](#character2d)
   - [CharacterFollowGrid](#characterfollowgrid)
   - [CharacterTarget](#charactertarget)
-  - [AnimationController](#animationcontroller)
   - [Energy](#energy)
   - [RandomSpeed](#randomspeed)
   - [RenderDepthUpdate](#renderdepthupdate)
   - [Selectable](#selectable)
   - [Sensor2D](#sensor2d)
   - [Sensors](#sensors)
-- [Custom Actor Example](#custom-actor-example)
+- [Custom Character Example](#custom-character-example)
 - [Usage Examples](#usage-examples)
-  - [Moving an Actor using Keyboard Input](#moving-an-actor-using-keyboard-input)
-  - [Making an Actor Jump](#making-an-actor-jump)
-  - [Making a Actor Perform a Melee Attack](#making-a-actor-perform-a-melee-attack)
+  - [Moving an Character using Keyboard Input](#moving-an-character-using-keyboard-input)
+  - [Making an Character Jump](#making-an-character-jump)
+  - [Making a Character Perform a Melee Attack](#making-a-character-perform-a-melee-attack)
   - [Applying Damage on Contact](#applying-damage-on-contact)
-  - [Detecting Another Actor with Sensor2D](#detecting-another-actor-with-sensor2d)
+  - [Detecting Another Character with Sensor2D](#detecting-another-character-with-sensor2d)
 
 ## Overview
 The system is built around the concept of characters, which are 2D game objects that can represent characters, enemies, NPCs, or any other entities that require specific behaviors and interactions in a game.
@@ -41,12 +41,12 @@ The `ICharacter` interface defines the basic properties and events of a characte
 - `Vector3 position`: The position of the character in 3D space.
 - `event Action<ICharacter, CharacterState> stateChanged`: An event that is raised whenever the state of the character changes. The `CharacterState` enum represents different states an character can have, such as idle, moving, attacking, etc.
 
-### ICharacterTimedAction
+### ICharacterTimedOrder
 
-The `ICharacterTimedAction` interface allows a character to perform a timed action, such as waiting or performing an action for a specific duration. This interface can be implemented by characters that require time-based behavior.
+The `ICharacterTimedOrder` interface allows a character to perform a timed order, such as waiting or performing an order for a specific duration. This interface can be implemented by characters that require time-based behavior.
 It has the following method:
 
-- `void PerformTimedAction(float duration)`: Starts the timed action for the specified duration.
+- `void Execute()`: Executes the timed order.
 
 ### IAnimationController
 
@@ -61,18 +61,44 @@ The interface has the following methods for animation controls:
 The `IHasHealth` interface allows a character to have a health system. Characters that can take damage and be destroyed should implement this interface to manage their health.
 The following properties control the character's health:
 
-- `float currentHealth`: The current health of the actor.
-- `float maxHealth`: The maximum health the actor can have.
+- `Energy health`: The current health of the character.
 
 ### ISelectable
 
 The `ISelectable` interface allows a game object to be selectable. This is useful for implementing interactions with specific objects in the game world.
-This system is handled with the methods:
+The following properties controls character selection
+
+- `bool canGetSelected`: Gets a value indicating whether the object can be selected.
+- `event Action isDisabled`: Event triggered when the object becomes disabled or unselectable.
+
+This is handled with the methods:
 
 - `void Select()`: Handles the selection of the game object.
 - `void Deselect()`: Handles the deselection of the game object.
 
 ## Classes
+
+### AnimationController
+
+The `AnimationController` class is a component that controls the animations of an character. It implements the `IAnimationController` interface.
+
+Public Properties
+
+- `displayObject`: The GameObject that holds the Animator component for the animations.
+- `additionalSprites`: Additional SpriteRenderers to change color when fading.
+- `excludeRendererFromEffects`: Renderers to exclude from color effects.
+
+Public Methods
+
+- `SetVerticalLookDirection(float direction)`: Sets the vertical look direction of the avatar animation.
+- `SetMaterialColor(Color color)`: Sets the color of all sprite children.
+- `FadeIn(float time = 1f)`: Initiates a fade-in effect for the avatar animation.
+- `FadeOut(float time = 1f)`: Initiates a fade-out effect for the avatar animation.
+- `FadeOutAfterDeath()`: Initiates a fade-out effect after the avatar's death.
+- `Reset()`: Resets the animation controller to the default state.
+- `SetAnimatorController(RuntimeAnimatorController controller)`: Sets the animator controller for the avatar animation.
+- `SetSpeed(float speed)`: Sets the playback speed of the avatar animation.
+- `ResetSpeed()`: Resets the playback speed of the avatar animation to normal (1).
 
 ### Character2D
 
@@ -80,13 +106,13 @@ The `Character2D` class is a component that represents a 2D character in the gam
 
 Public Properties
 
-- `health`: Gets the current health of the character. You can use this property to access the character's health and perform actions like healing or taking damage.
+- `health`: Gets the current health of the character. You can use this property to access the character's health and perform orders like healing or taking damage.
 - `needsHealing`: Gets a boolean value indicating if the character needs healing. It returns true if the character is alive and its health is not full.
 - `movementSpeed`: Represents the movement speed of the character.
 - `verticalMovementDampening`: Represents the dampening effect applied to the vertical movement of the character.
-- `target`: Represents the current target of the character. It allows you to set a target for the character to move towards or perform actions on.
+- `target`: Represents the current target of the character. It allows you to set a target for the character to move towards or perform orders on.
 - `lookDirection`: Represents the direction the character is looking at.
-- `actionPivot`: Represents the pivot point for performing actions.
+- `orderPivot`: Represents the pivot point for performing orders.
 
 Public Methods
 
@@ -104,8 +130,8 @@ Public Methods
 - `Freeze()`: Makes the character stand still at the current position and prevents it from being moved around by other characters.
 - `UnFreeze()`: Unfreezes the character, allowing it to move and be affected by physics.
 - `StopMovement()`: Stops the character's movement, disables the target, and sets the state to Idle.
-- `TakeAction(Character2D targetCharacter)`: Initiates the character to take an action on a target character, such as attacking or using a skill.
-- `TakeAction(IEnumeratedAction enumeratedAction)`: Initiates the character to take an action as part of an IEnumeratedAction sequence.
+- `TakeOrder(Character2D targetCharacter)`: Initiates the character to take an order on a target character, such as attacking or using a skill.
+- `TakeOrder(IEnumeratedOrder enumeratedOrder)`: Initiates the character to take an order as part of an IEnumeratedOrder sequence.
 
 
 ### CharacterFollowGrid
@@ -133,31 +159,9 @@ Public Methods
 - `DisableTarget()`: Disables the current target and clears any target-related data.
 - `SetPathField(IPathField field)`: Sets the pathfinding field to be used for calculating the path to the target.
 
-### AnimationController
-
-The `AnimationController` class is a component that controls the animations of an character. It implements the `IAnimationController` interface.
-
-Public Properties
-
-- `displayObject`: The GameObject that holds the Animator component for the animations.
-- `additionalSprites`: Additional SpriteRenderers to change color when fading.
-- `excludeRendererFromEffects`: Renderers to exclude from color effects.
-
-Public Methods
-
-- `SetVerticalLookDirection(float direction)`: Sets the vertical look direction of the avatar animation.
-- `SetMaterialColor(Color color)`: Sets the color of all sprite children.
-- `FadeIn(float time = 1f)`: Initiates a fade-in effect for the avatar animation.
-- `FadeOut(float time = 1f)`: Initiates a fade-out effect for the avatar animation.
-- `FadeOutAfterDeath()`: Initiates a fade-out effect after the avatar's death.
-- `Reset()`: Resets the animation controller to the default state.
-- `SetAnimatorController(RuntimeAnimatorController controller)`: Sets the animator controller for the avatar animation.
-- `SetSpeed(float speed)`: Sets the playback speed of the avatar animation.
-- `ResetSpeed()`: Resets the playback speed of the avatar animation to normal (1).
-
 ### Energy
 
-The `Energy` class is a component that represents an energy system for an character. It can be used to manage an character's energy level and perform energy-based actions.
+The `Energy` class is a component that represents an energy system for an character. It can be used to manage an character's energy level and perform energy-based orders.
 
 Public Properties
 
@@ -246,8 +250,8 @@ To create a custom character in your game, you can follow these steps:
 1. Create a new 2D game object in the Unity editor.
 2. Attach a `Rigidbody2D` component to the gameobject as `Character2D` uses it
 3. Attach a `Collider2D` component to the gameobject as `Character2D` uses it
-4. Attach the `Character2D` component to the game object to make it an actor.
-5. Optionally, attach other components such as `AnimationController`, `Energy`, or custom action scripts to provide additional functionalities to the character.
+4. Attach the `Character2D` component to the game object to make it an character.
+5. Optionally, attach other components such as `AnimationController`, `Energy`, or custom order scripts to provide additional functionalities to the character.
 
 ## Usage Examples
 
@@ -286,16 +290,16 @@ public class CharacterMovement : MonoBehaviour
 In this example, the `CharacterMovement` script is attached to an `Character2D` game object. The `Update` method retrieves horizontal and vertical input values using `Input.GetAxis` to detect arrow key inputs. The calculated movement direction is then normalized and passed to the `SetMovement` method of the `Character2D` component, allowing the character to move in the specified direction at a constant speed, based on the input provided.
 
 ### Making an Character Jump
-The provided code demonstrates how to make an character perform a jump in a 2D Unity game using a custom timed action.
+The provided code demonstrates how to make an character perform a jump in a 2D Unity game using a custom timed order.
 
 ```csharp
 using UnityEngine;
 using egads.system.characters;
 
-// Custom character action for player
-public class JumpAction : ICharacterTimedAction
+// Custom character order for player
+public class JumpOrder : ICharacterTimedOrder
 {
-    // Implementations of ICharacterTimedAction
+    // Implementations of ICharacterTimedOrder
     public float range => jumpRange;
     public float cooldown => jumpCooldown;
 
@@ -311,7 +315,7 @@ public class JumpAction : ICharacterTimedAction
     // Reference to the Rigidbody2D component of the character.
     private Rigidbody2D rigidbody;
 
-    public JumpAction(float jumpRange, float jumpCooldown, Vector2 jumpForce, Rigidbody2D rigidbody)
+    public JumpOrder(float jumpRange, float jumpCooldown, Vector2 jumpForce, Rigidbody2D rigidbody)
     {
         this.jumpRange = jumpRange;
         this.jumpCooldown = jumpCooldown;
@@ -319,14 +323,14 @@ public class JumpAction : ICharacterTimedAction
         this.rigidbody = rigidbody;
     }
 
-    // Executes the jump action by applying the jump force to the character's Rigidbody2D.
+    // Executes the jump order by applying the jump force to the character's Rigidbody2D.
     public void Execute()
     {
         rigidbody.AddForce(jumpForce, ForceMode2D.Impulse);
     }
 }
 ```
-The `JumpAction` class is a custom implementation of the `ICharacterTimedAction` interface. It defines the jump action for the character, including the jump range, jump cooldown, jump force, and the character's `Rigidbody2D`. The range property returns the jump range, representing the maximum distance the character can jump. The cooldown property returns the jump cooldown, which is the time period between consecutive jumps. The `Execute()` method is responsible for executing the jump action. It applies the jump force to the character's `Rigidbody2D`, causing it to jump with an impulse force.
+The `JumpOrder` class is a custom implementation of the `ICharacterTimedOrder` interface. It defines the jump order for the character, including the jump range, jump cooldown, jump force, and the character's `Rigidbody2D`. The range property returns the jump range, representing the maximum distance the character can jump. The cooldown property returns the jump cooldown, which is the time period between consecutive jumps. The `Execute()` method is responsible for executing the jump order. It applies the jump force to the character's `Rigidbody2D`, causing it to jump with an impulse force.
 ```csharp
 using UnityEngine;
 using egads.system.characters;
@@ -349,8 +353,8 @@ public class JumpExample : MonoBehaviour
     {
         character = GetComponent<Character2D>();
         rb = GetComponent<Rigidbody2D>();
-        JumpAction jumpAction = new JumpAction(jumpRange, jumpCooldown, new Vector2(0, jumpForce), rb);
-        character.action = jumpAction;
+        JumpOrder jumpOrder = new JumpOrder(jumpRange, jumpCooldown, new Vector2(0, jumpForce), rb);
+        character.order = jumpOrder;
     }
 
     private void Update()
@@ -358,8 +362,8 @@ public class JumpExample : MonoBehaviour
         // Check for jump input (e.g., space key) and if the character is grounded.
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
-            // Tell the character to take the assigned action, which in this case, is the jump action.
-            character.TakeAction(character);
+            // Tell the character to take the assigned order, which in this case, is the jump order.
+            character.TakeOrder(character);
         }
     }
 
@@ -372,7 +376,7 @@ public class JumpExample : MonoBehaviour
     }
 }
 ```
-The JumpExample class is attached to the player `GameObject` in the scene. It exposes public variables to set the jump force, jump range, and jump cooldown in the Unity Inspector. In the `Start()` method, the JumpAction is created with the specified jump range, jump cooldown, jump force, and the player's `Rigidbody2D`. It then assigns this action to the `character.action`, making the character aware of the jump action. In the `Update()` method, the script checks for jump input (e.g., space key) and whether the character is grounded using the `IsGrounded()` method. If both conditions are met, the `character.TakeAction(character)` method is called, which triggers the character to execute the assigned jump action.
+The `JumpExample` class is attached to the player `GameObject` in the scene. It exposes public variables to set the jump force, jump range, and jump cooldown in the Unity Inspector. In the `Start()` method, the `JumpOrder` is created with the specified jump range, jump cooldown, jump force, and the player's `Rigidbody2D`. It then assigns this order to the `character.order`, making the character aware of the jump order. In the `Update()` method, the script checks for jump input (e.g., space key) and whether the character is grounded using the `IsGrounded()` method. If both conditions are met, the `character.TakeOrder(character)` method is called, which triggers the character to execute the assigned jump order.
 
 ### Making a Character Perform a Melee Attack
 You can create a melee attack behavior for an `Character2D` by detecting nearby characters within a certain range and applying damage to them. Here's an example script for a melee attack:

@@ -2,17 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace egads.system.actions
+namespace egads.system.orders
 {
     /// <summary>
-    /// Represents a list of actions that get executed one after another (in a queue).
+    /// Represents a list of orders that get executed one after another (in a queue).
     /// </summary>
-    public class ActionQueue
+    public class OrderQueue
     {
         #region Public Properties
 
         /// <summary>
-        /// Gets a value indicating whether the action queue has any content (actions).
+        /// Gets a value indicating whether the order queue has any content (orders).
         /// </summary>
         public bool hasContent => _queue.Count > 0;
 
@@ -20,36 +20,36 @@ namespace egads.system.actions
 
         #region Private Properties
 
-        private Queue<IActionQueueElement> _queue = new Queue<IActionQueueElement>();
+        private Queue<IOrderQueueElement> _queue = new Queue<IOrderQueueElement>();
 
         #endregion
 
         #region Public Methods
 
         /// <summary>
-        /// Should be called every frame by the parent object to update the action queue.
+        /// Should be called every frame by the parent object to update the order queue.
         /// </summary>
         public void Update()
         {
             // If the queue is empty, no need to update anything
             if (_queue.Count == 0) { return; }
 
-            // Get the current action in front of the queue
-            IActionQueueElement currentElement = _queue.Peek();
+            // Get the current order in front of the queue
+            IOrderQueueElement currentElement = _queue.Peek();
 
-            // Update the current action
+            // Update the current order
             currentElement.Update();
 
-            // Check if the current action has ended
+            // Check if the current order has ended
             if (currentElement.hasEnded)
             {
-                // Perform OnExit on the current action
+                // Perform OnExit on the current order
                 currentElement.OnExit();
 
-                // Remove the current action from the queue
+                // Remove the current order from the queue
                 _queue.Dequeue();
 
-                // If there are more actions in the queue, start the next action
+                // If there are more orders in the queue, start the next order
                 if (_queue.Count > 0)
                 {
                     currentElement = _queue.Peek();
@@ -59,41 +59,41 @@ namespace egads.system.actions
         }
 
         /// <summary>
-        /// Adds a new element to the back of the action queue.
+        /// Adds a new element to the back of the order queue.
         /// </summary>
-        /// <param name="element">The action to add.</param>
-        public void Add(IActionQueueElement element)
+        /// <param name="element">The order to add.</param>
+        public void Add(IOrderQueueElement element)
         {
             if (element != null)
             {
                 _queue.Enqueue(element);
 
-                // If this is the first action in the queue, call its OnStart method.
+                // If this is the first order in the queue, call its OnStart method.
                 if (_queue.Count == 1) { element.OnStart(); }
             }
         }
 
         /// <summary>
-        /// Adds a time duration where nothing happens (a pause) to the action queue.
+        /// Adds a time duration where nothing happens (a pause) to the order queue.
         /// </summary>
         /// <param name="duration">The duration of the pause.</param>
         public void AddPause(float duration)
         {
-            // Add an action to the queue that waits for the specified duration.
-            Add(new ActionWait(duration));
+            // Add an order to the queue that waits for the specified duration.
+            Add(new OrderWait(duration));
         }
 
         /// <summary>
-        /// Calls OnExit on the current element and clears all entries from the action queue.
+        /// Calls OnExit on the current element and clears all entries from the order queue.
         /// </summary>
         public void Clear()
         {
             if (_queue.Count > 0)
             {
-                // Get the current action in front of the queue
-                IActionQueueElement currentElement = _queue.Peek();
+                // Get the current order in front of the queue
+                IOrderQueueElement currentElement = _queue.Peek();
 
-                // Perform OnExit on the current action
+                // Perform OnExit on the current order
                 currentElement.OnExit();
 
                 // Clear the queue

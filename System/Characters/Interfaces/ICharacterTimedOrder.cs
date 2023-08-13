@@ -1,19 +1,19 @@
 ﻿namespace egads.system.characters
 {
     /// <summary>
-    /// Interface representing an actor's timed action in the game.
+    /// Interface representing an chracter's timed order in the game.
     /// </summary>
-    public interface ICharacterTimedAction
+    public interface ICharacterTimedOrder
     {
         #region Properties
 
         /// <summary>
-        /// Gets the range of the timed action.
+        /// Gets the range of the timed order.
         /// </summary>
         float range { get; }
 
         /// <summary>
-        /// Gets the cooldown time for the timed action.
+        /// Gets the cooldown time for the timed order.
         /// </summary>
         float cooldown { get; }
 

@@ -1,16 +1,16 @@
 ﻿using egads.system.timer;
 
-namespace egads.system.actions
+namespace egads.system.orders
 {
     /// <summary>
-    /// Represents an action that adds a time delay (wait) before completing.
+    /// Represents an order that adds a time delay (wait) before completing.
     /// </summary>
-    public class ActionWait : IActionQueueElement
+    public class OrderWait : IOrderQueueElement
     {
         #region Public Properties
 
         /// <summary>
-        /// Gets a value indicating whether the wait action has ended.
+        /// Gets a value indicating whether the wait order has ended.
         /// </summary>
         public bool hasEnded => _timer.hasEnded;
 
@@ -26,16 +26,16 @@ namespace egads.system.actions
         #region Public Methods
 
         /// <summary>
-        /// Creates a new instance of the ActionWait class with the specified duration.
+        /// Creates a new instance of the OrderWait class with the specified duration.
         /// </summary>
-        /// <param name="duration">The duration of the wait action in seconds.</param>
-        public ActionWait(float duration)
+        /// <param name="duration">The duration of the wait order in seconds.</param>
+        public OrderWait(float duration)
         {
             _duration = duration;
         }
 
         /// <summary>
-        /// Called when the wait action starts. Initializes the timer with the specified duration.
+        /// Called when the wait order starts. Initializes the timer with the specified duration.
         /// </summary>
         public void OnStart()
         {
@@ -43,7 +43,7 @@ namespace egads.system.actions
         }
 
         /// <summary>
-        /// Updates the wait action by updating the timer.
+        /// Updates the wait order by updating the timer.
         /// </summary>
         public void Update()
         {
@@ -51,11 +51,11 @@ namespace egads.system.actions
         }
 
         /// <summary>
-        /// Called when the wait action is completed or interrupted. It does nothing in this case.
+        /// Called when the wait order is completed or interrupted. It does nothing in this case.
         /// </summary>
         public void OnExit()
         {
-            // Empty: The wait action does not require any cleanup when it completes.
+            // Empty: The wait order does not require any cleanup when it completes.
         }
 
         #endregion

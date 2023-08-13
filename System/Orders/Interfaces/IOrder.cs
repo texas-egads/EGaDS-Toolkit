@@ -1,15 +1,15 @@
 ﻿
-namespace egads.system.actions
+namespace egads.system.orders
 {
     /// <summary>
-    /// Defines an action
+    /// Defines an order
     /// </summary>
-    public interface IAction
+    public interface IOrder
     {
         #region Methods
 
         /// <summary>
-        /// Executes the action.
+        /// Executes the order.
         /// </summary>
         void Execute();
 
