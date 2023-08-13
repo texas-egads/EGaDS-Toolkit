@@ -27,7 +27,7 @@ namespace egads.system.characters
         private bool _isActive = true;
 
         private Transform _transform;
-        private Character2D _actor;
+        private Character2D _character;
 
         #endregion
 
@@ -40,11 +40,11 @@ namespace egads.system.characters
         {
             _transform = transform;
 
-            _actor = GetComponent<Character2D>();
-            if (_actor != null)
+            _character = GetComponent<Character2D>();
+            if (_character != null)
             {
-                // Subscribe to the actor's stateChanged event to handle changes in actor state.
-                _actor.stateChanged += ActorStateChanged;
+                // Subscribe to the character's stateChanged event to handle changes in character state.
+                _character.stateChanged += CharacterStateChanged;
             }
         }
 
@@ -73,15 +73,15 @@ namespace egads.system.characters
         #region Private Methods
 
         /// <summary>
-        /// Event handler for the actor's stateChanged event.
-        /// Resets the rendering depth when the actor becomes active again after being dead (inactive).
+        /// Event handler for the character's stateChanged event.
+        /// Resets the rendering depth when the character becomes active again after being dead (inactive).
         /// </summary>
-        /// <param name="activeActor">The actor that changed state.</param>
-        /// <param name="state">The new state of the actor.</param>
-        private void ActorStateChanged(ICharacter activeActor, CharacterState state)
+        /// <param name="activeCharacter">The character that changed state.</param>
+        /// <param name="state">The new state of the character.</param>
+        private void CharacterStateChanged(ICharacter activeCharacter, CharacterState state)
         {
-            // Reset depth rendering when actor is active again after being dead.
-            if (activeActor.isAlive && !_isActive)
+            // Reset depth rendering when character is active again after being dead.
+            if (activeCharacter.isAlive && !_isActive)
             {
                 _isActive = true;
             }

@@ -5,9 +5,9 @@ using UnityEngine;
 namespace egads.system.characters
 {
     /// <summary>
-    /// Component that detects and tracks other actors within its 2D trigger collider and raises events for detected and lost actors.
-    /// The detected actors are filtered based on their tags (if provided).
-    /// This class uses the "IActor" interface for actor representation and provides a basic event system for handling actor detection and state changes.
+    /// Component that detects and tracks other characters within its 2D trigger collider and raises events for detected and lost characters.
+    /// The detected characters are filtered based on their tags (if provided).
+    /// This class uses the "ICharacter" interface for character representation and provides a basic event system for handling character detection and state changes.
     /// </summary>
     public class Sensor2D : MonoBehaviour
     {
@@ -17,8 +17,8 @@ namespace egads.system.characters
         /// Delegate for sensor events.
         /// </summary>
         /// <param name="type">The type of sensor event.</param>
-        /// <param name="actor">The detected or lost actor.</param>
-        public delegate void SensorEventDelegate(SensorEvent type, ICharacter actor);
+        /// <param name="character">The detected or lost character.</param>
+        public delegate void SensorEventDelegate(SensorEvent type, ICharacter character);
         public event SensorEventDelegate sensorEvent;
 
         #endregion
@@ -26,17 +26,17 @@ namespace egads.system.characters
         #region Public Properties
 
         /// <summary>
-        /// The tag to filter detected actors. If empty, all actors are detected.
+        /// The tag to filter detected characters. If empty, all characters are detected.
         /// </summary>
         public string searchTag = "";
 
         /// <summary>
-        /// List of actors detected by the sensor.
+        /// List of characters detected by the sensor.
         /// </summary>
         public List<ICharacter> characters = new List<ICharacter>();
 
         /// <summary>
-        /// Gets a value indicating whether the sensor has detected any actors.
+        /// Gets a value indicating whether the sensor has detected any characters.
         /// </summary>
         public bool hasCharactersDetected => characters.Count > 0;
 
@@ -67,36 +67,36 @@ namespace egads.system.characters
 
         /// <summary>
         /// Called when a GameObject enters the 2D trigger collider.
-        /// Detects actors and raises events accordingly.
+        /// Detects characters and raises events accordingly.
         /// </summary>
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (searchTag == "" || other.tag == searchTag)
             {
-                ICharacter actor = other.transform.GetInterface<ICharacter>();
-                if (actor != null && actor != _self && !characters.Contains(actor) && actor.isAlive)
+                ICharacter character = other.transform.GetInterface<ICharacter>();
+                if (character != null && character != _self && !characters.Contains(character) && character.isAlive)
                 {
-                    characters.Add(actor);
+                    characters.Add(character);
 
-                    // Subscribe to the actor's stateChanged event to handle changes in actor state.
-                    actor.stateChanged += Actor_StateChanged;
+                    // Subscribe to the character's stateChanged event to handle changes in character state.
+                    character.stateChanged += Character_StateChanged;
 
-                    // Raise the sensor event for actor detection.
-                    if (sensorEvent != null) { sensorEvent(SensorEvent.CharacterDetected, actor); }
+                    // Raise the sensor event for character detection.
+                    if (sensorEvent != null) { sensorEvent(SensorEvent.CharacterDetected, character); }
                 }
             }
         }
 
         /// <summary>
         /// Called when a GameObject exits the 2D trigger collider.
-        /// Removes actors from the detected list and raises events accordingly.
+        /// Removes characters from the detected list and raises events accordingly.
         /// </summary>
         private void OnTriggerExit2D(Collider2D other)
         {
             if (searchTag == "" || other.tag == searchTag)
             {
-                ICharacter actor = other.transform.GetInterface<ICharacter>();
-                Remove(actor);
+                ICharacter character = other.transform.GetInterface<ICharacter>();
+                Remove(character);
             }
         }
 
@@ -105,45 +105,45 @@ namespace egads.system.characters
         #region Private Methods
 
         /// <summary>
-        /// Event handler for the actor's stateChanged event.
-        /// Handles the removal of actors when they become inactive (dead).
+        /// Event handler for the character's stateChanged event.
+        /// Handles the removal of characters when they become inactive (dead).
         /// </summary>
-        private void Actor_StateChanged(ICharacter actor, CharacterState state)
+        private void Character_StateChanged(ICharacter character, CharacterState state)
         {
-            if (!actor.isAlive)
+            if (!character.isAlive)
             {
-                if (characters.Contains(actor))
+                if (characters.Contains(character))
                 {
-                    Remove(actor);
+                    Remove(character);
                 }
                 else
                 {
-                    // Unsubscribe from the actor's stateChanged event if the actor is no longer in the detected list.
-                    actor.stateChanged -= Actor_StateChanged;
+                    // Unsubscribe from the character's stateChanged event if the character is no longer in the detected list.
+                    character.stateChanged -= Character_StateChanged;
                 }
             }
         }
 
         /// <summary>
-        /// Removes the specified actor from the detected list and raises the sensor event accordingly.
+        /// Removes the specified character from the detected list and raises the sensor event accordingly.
         /// </summary>
-        private void Remove(ICharacter actor)
+        private void Remove(ICharacter character)
         {
-            if (actor != null && characters.Contains(actor))
+            if (character != null && characters.Contains(character))
             {
-                characters.Remove(actor);
+                characters.Remove(character);
 
-                // Unsubscribe from the actor's stateChanged event.
-                actor.stateChanged -= Actor_StateChanged;
+                // Unsubscribe from the character's stateChanged event.
+                character.stateChanged -= Character_StateChanged;
 
-                // Raise the sensor event for actor leaving.
+                // Raise the sensor event for character leaving.
                 if (sensorEvent != null)
-                    sensorEvent(SensorEvent.CharacterLeft, actor);
+                    sensorEvent(SensorEvent.CharacterLeft, character);
             }
         }
 
         /// <summary>
-        /// Updates the detected actors list by removing any null references.
+        /// Updates the detected characters list by removing any null references.
         /// </summary>
         private void UpdateList()
         {

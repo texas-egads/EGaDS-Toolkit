@@ -3,7 +3,7 @@ using System.Collections;
 using egads.tools.extensions;
 using egads.tools.objects;
 using egads.tools.utils;
-using egads.system.actions;
+using egads.system.orders;
 using egads.system.timer;
 using egads.system.gameManagement;
 
@@ -159,7 +159,7 @@ namespace egads.system.characters
 
         public Vector2 lookDirection = Vector2.zero;
 
-        public Transform actionPivot;
+        public Transform orderPivot;
 
         #endregion
 
@@ -195,7 +195,7 @@ namespace egads.system.characters
         public bool isEnabled => !(state == CharacterState.Disabled);
 
         /// <summary>
-        /// Returns true if the actor is ready to perform actions.
+        /// Returns true if the actor is ready to perform orders.
         /// </summary>
         public bool isReady => (state == CharacterState.Idle || state == CharacterState.Moving);
 
@@ -203,12 +203,12 @@ namespace egads.system.characters
 
         #endregion
 
-        #region Actions
+        #region Orders
 
         /// <summary>
-        /// The timed action that this actor can perform.
+        /// The timed order that this actor can perform.
         /// </summary>
-        public ICharacterTimedAction action;
+        public ICharacterTimedOrder order;
 
         #endregion
 
@@ -257,7 +257,7 @@ namespace egads.system.characters
         private Transform _transform;
         private Rigidbody2D _rigidbody2D;
         private Collider2D _collider2D;
-        private Timer _actionTimer = null;
+        private Timer _orderTimer = null;
 
         // Cached values for movement and input handling
         private Vector2 _lastMovement = Vector2.zero;
@@ -306,7 +306,7 @@ namespace egads.system.characters
 
         /// <summary>
         /// Called in fixed intervals (physics updates).
-        /// Handles slow movement damping, hit visuals timer, target updates, movement updates, and action updates.
+        /// Handles slow movement damping, hit visuals timer, target updates, movement updates, and order updates.
         /// </summary>
         void FixedUpdate()
         {
@@ -354,19 +354,19 @@ namespace egads.system.characters
                 else { MoveTowardsTarget(); }
             }
 
-            // Update action
-            if (_actionTimer != null)
+            // Update order
+            if (_orderTimer != null)
             {
-                _actionTimer.Update();
-                if (_actionTimer.hasEnded)
+                _orderTimer.Update();
+                if (_orderTimer.hasEnded)
                 {
                     state = CharacterState.Idle;
-                    _actionTimer = null;
+                    _orderTimer = null;
                 }
-                else { return; } // Wait for actions to finish
+                else { return; } // Wait for orders to finish
             }
 
-            // Resume actions when idle and has a target
+            // Resume orders when idle and has a target
             if (state == CharacterState.Idle && target.hasTarget)
             {
                 state = CharacterState.Moving;
@@ -511,7 +511,7 @@ namespace egads.system.characters
         {
             if (!isAlive) { return; }
 
-            if (action != null) { target.SetTarget(otherCharacter, action.range * 0.9f, determined); }
+            if (order != null) { target.SetTarget(otherCharacter, order.range * 0.9f, determined); }
 
             if (state == CharacterState.Idle) { state = CharacterState.Moving; }
         }
@@ -580,39 +580,39 @@ namespace egads.system.characters
         }
 
         /// <summary>
-        /// Initiates the actor to take an action on a target actor, such as attacking or using a skill.
+        /// Initiates the actor to take an order on a target actor, such as attacking or using a skill.
         /// </summary>
-        /// <param name="targetActor">The target actor on which the action will be performed.</param>
-        public void TakeAction(Character2D targetCharacter)
+        /// <param name="targetActor">The target actor on which the order will be performed.</param>
+        public void TakeOrder(Character2D targetCharacter)
         {
             if (!isAlive) { return; }
 
-            _actionTimer = new Timer(action.cooldown);
+            _orderTimer = new Timer(order.cooldown);
             isMoving = false;
 
             // Update look direction
             SetLookDirectionToTarget(targetCharacter.position2D);
 
-            state = CharacterState.TakingAction;
+            state = CharacterState.TakingOrder;
 
-            action.Execute();
+            order.Execute();
         }
 
         /// <summary>
-        /// Initiates the actor to take an action as part of an IEnumeratedAction sequence.
+        /// Initiates the actor to take an order as part of an IEnumeratedOrder sequence.
         /// </summary>
-        /// <param name="enumeratedAction">The IEnumeratedAction representing the action sequence.</param>
-        public void TakeAction(IEnumeratedAction enumeratedAction)
+        /// <param name="enumeratedOrder">The IEnumeratedOrder representing the order sequence.</param>
+        public void TakeOrder(IEnumeratedOrder enumeratedOrder)
         {
             isMoving = false;
-            state = CharacterState.TakingAction;
+            state = CharacterState.TakingOrder;
 
-            StartCoroutine(StartAction(enumeratedAction));
+            StartCoroutine(StartOrder(enumeratedOrder));
         }
 
-        private IEnumerator StartAction(IEnumeratedAction enumeratedAction)
+        private IEnumerator StartOrder(IEnumeratedOrder enumeratedOrder)
         {
-            yield return StartCoroutine(enumeratedAction.Execute());
+            yield return StartCoroutine(enumeratedOrder.Execute());
             state = CharacterState.Idle;
         }
 
@@ -622,7 +622,7 @@ namespace egads.system.characters
 
         #region Private Methods
 
-        #region Movement and Actions
+        #region Movement and Orders
 
         /// <summary>
         /// Handles collision detection and calculates avoidance when colliding with other objects while moving.
@@ -663,9 +663,9 @@ namespace egads.system.characters
             if (target.isReached)
             {
                 // Attack if possible
-                if (target.type == CharacterTarget.TargetType.Character && TargetInReach() && action != null)
+                if (target.type == CharacterTarget.TargetType.Character && TargetInReach() && order != null)
                 {
-                    TakeAction(target.otherCharacter);
+                    TakeOrder(target.otherCharacter);
                     return;
                 }
 
@@ -688,7 +688,7 @@ namespace egads.system.characters
         private bool TargetInReach()
         {
             Vector2 direction = position2D - target.otherCharacter.position2D;
-            return direction.magnitude <= action.range;
+            return direction.magnitude <= order.range;
         }
 
         /// <summary>
@@ -736,7 +736,7 @@ namespace egads.system.characters
         }
 
         /// <summary>
-        /// Handles the death of the actor, triggers necessary actions, and initiates destruction if required.
+        /// Handles the death of the actor, triggers necessary orders, and initiates destruction if required.
         /// </summary>
         private void Die()
         {
@@ -888,4 +888,3 @@ namespace egads.system.characters
 
     }
 }
-

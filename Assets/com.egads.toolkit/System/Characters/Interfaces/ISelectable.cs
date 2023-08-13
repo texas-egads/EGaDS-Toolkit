@@ -18,7 +18,7 @@ namespace egads.system.characters
         /// Event triggered when the object becomes disabled or unselectable.
         /// </summary>
         event Action isDisabled;
-
+        
         #endregion
 
         #region Methods

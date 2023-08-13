@@ -4,7 +4,7 @@ using System;
 namespace egads.system.characters
 {
     /// <summary>
-    /// Component that adds a random speed boost to an Actor2D's movement speed upon Awake.
+    /// Component that adds a random speed boost to an Character2D's movement speed upon Awake.
     /// </summary>
     public class RandomSpeed : MonoBehaviour
     {
@@ -22,13 +22,13 @@ namespace egads.system.characters
 
         /// <summary>
         /// Called when the GameObject is initialized.
-        /// Adds a random speed boost to the Actor2D's movement speed.
+        /// Adds a random speed boost to the Character2D's movement speed.
         /// </summary>
         private void Awake()
         {
-            Character2D actor = GetComponent<Character2D>();
-            // Add a random value to the actor's movement speed based on the multiplier.
-            actor.movementSpeed += UnityEngine.Random.Range(1f, multiplier);
+            Character2D character = GetComponent<Character2D>();
+            // Add a random value to the character's movement speed based on the multiplier.
+            character.movementSpeed += UnityEngine.Random.Range(1f, multiplier);
         }
 
         #endregion

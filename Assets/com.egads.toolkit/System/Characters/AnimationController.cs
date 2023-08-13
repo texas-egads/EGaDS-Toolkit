@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using egads.tools.utils;
 using egads.system.timer;
 using egads.system.gameManagement;
-using System.Xml.Linq;
 
 namespace egads.system.characters
 {
     /// <summary>
-    /// Controls the animations of the actor using the Unity Animator system.
+    /// Controls the animations of the character using the Unity Animator system.
     /// </summary>
     public class AnimationController : MonoBehaviour, IAnimationController
     {
@@ -63,8 +62,8 @@ namespace egads.system.characters
 
         #region Private Properties
 
-        // Reference to the Actor2D component attached to this GameObject.
-        private Character2D _actor;
+        // Reference to the Character2D component attached to this GameObject.
+        private Character2D _character;
 
         // Reference to the Animator component for playing animations.
         private Animator _animator;
@@ -88,15 +87,15 @@ namespace egads.system.characters
 
         private void Awake()
         {
-            // Get the Actor2D component attached to this GameObject.
-            _actor = GetComponent<Character2D>(); 
-            if (_actor != null) { _actor.stateChanged += ActorStateChangedHandler; }
+            // Get the Character2D component attached to this GameObject.
+            _character = GetComponent<Character2D>(); 
+            if (_character != null) { _character.stateChanged += CharacterStateChangedHandler; }
 
             if (displayObject != null) { _animator = displayObject.GetComponentInChildren<Animator>(); }
 
             // Gather the materials of renderers for color effects.
             if (displayObject != null) { GatherRendererMaterials(); } 
-            else { Debug.Log("Actor " + gameObject.name + " has AnimationController but no display object assigned"); }
+            else { Debug.Log("Character " + gameObject.name + " has AnimationController but no display object assigned"); }
 
             _isInitialized = true;
         }
@@ -246,14 +245,14 @@ namespace egads.system.characters
         }
 
         /// <summary>
-        /// Handles the change in the actor's state and updates the avatar animation accordingly.
+        /// Handles the change in the character's state and updates the avatar animation accordingly.
         /// </summary>
-        /// <param name="activeActor">The active actor implementing the IActor interface.</param>
-        /// <param name="state">The new state of the actor.</param>
-        private void ActorStateChangedHandler(ICharacter activeActor, CharacterState state)
+        /// <param name="activeCharacter">The active character implementing the ICharacter interface.</param>
+        /// <param name="state">The new state of the character.</param>
+        private void CharacterStateChangedHandler(ICharacter activeCharacter, CharacterState state)
         {
             if (state == CharacterState.Dead) { SetAnimation(AvatarAnimation.die); }
-            else if (state == CharacterState.TakingAction) { SetAnimation(AvatarAnimation.attack); }
+            else if (state == CharacterState.TakingOrder) { SetAnimation(AvatarAnimation.attack); }
             else if (state == CharacterState.Moving) { SetAnimation(AvatarAnimation.walk); }
             else if (state == CharacterState.Idle) { SetAnimation(AvatarAnimation.idle); }
         }

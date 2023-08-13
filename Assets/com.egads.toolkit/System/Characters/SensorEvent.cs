@@ -1,17 +1,17 @@
 ﻿namespace egads.system.characters
 {
     /// <summary>
-    /// Enumeration representing different sensor events for actors.
+    /// Enumeration representing different sensor events for characters.
     /// </summary>
     public enum SensorEvent
     {
         /// <summary>
-        /// Event indicating that an actor has been detected by the sensor.
+        /// Event indicating that a character has been detected by the sensor.
         /// </summary>
         CharacterDetected,
 
         /// <summary>
-        /// Event indicating that an actor has left the sensor's detection area.
+        /// Event indicating that a character has left the sensor's detection area.
         /// </summary>
         CharacterLeft
     }
