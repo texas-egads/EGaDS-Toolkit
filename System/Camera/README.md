@@ -2,6 +2,7 @@
 
 This camera system provided in this codebase offers a comprehensive set of features to manage camera behavior in Unity projects. This system includes two main components: `CameraShake` and `CameraSmoothFollow2D`.
 
+## Table of Contents
 - [Classes](#classes)
   - [CameraShake](#camerashake)
   - [CameraSmoothFollow2D](#camerasmoothfollow2d)
