@@ -13,7 +13,6 @@ This camera system provided in this codebase offers a comprehensive set of featu
   - [CameraTarget Implementation](#cameratarget-implementation)
 
 ## Classes
-
 ### CameraShake
 
 The `CameraShake` component handles camera shaking functionality, allowing you to simulate visual effects such as earthquakes, impacts, or explosions. It smoothly applies a random positional offset to the camera, creating a shaking effect. The shaking intensity and rate of decrease can be adjusted.
