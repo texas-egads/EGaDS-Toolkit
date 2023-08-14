@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace egads.system.debugging
+namespace egads.system.utilities
 {
 	/// <summary>
 	/// Editor script for visualizing camera bounds with 2D / orthographic camera

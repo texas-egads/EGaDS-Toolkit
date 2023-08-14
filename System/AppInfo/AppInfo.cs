@@ -153,6 +153,18 @@ namespace egads.system.application
                     hasTwoMouseButtons = true;
                     hasMouse = true;
                     break;
+                case RuntimePlatform.PS4:
+                    hasTwoMouseButtons = false;
+                    hasMouse = false;
+                    break;
+                case RuntimePlatform.XboxOne:
+                    hasTwoMouseButtons = false;
+                    hasMouse = false;
+                    break;
+                case RuntimePlatform.Switch: 
+                    hasTwoMouseButtons = false; 
+                    hasMouse = false;
+                    break;
                 default:
                     break;
             }

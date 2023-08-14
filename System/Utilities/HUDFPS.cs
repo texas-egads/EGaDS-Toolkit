@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace egads.system.debugging
+namespace egads.system.utilities
 {
     /// <summary>
     /// Attach this to a Text component to make a frames/second indicator.

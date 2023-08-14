@@ -1,46 +1,56 @@
 ﻿using UnityEngine;
 
 #if !UNITY_WEBPLAYER && !UNITY_METRO
-
 using System.IO;
-
 #endif
 
 namespace egads.system.fileManagement
 {
-	public static class FileUtility
-	{
-        #region Public Properties
-
+    public static class FileUtility
+    {
+        /// <summary>
+        /// Indicates whether the platform can load and save files.
+        /// </summary>
         public static bool canLoadAndSaveFiles
-		{
-			get
-			{
-				if (Application.platform == RuntimePlatform.WebGLPlayer) { return false; }
-				return true;
-			}
-		}
-
-        #endregion
+        {
+            get
+            {
+                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
 
         #region Non Web Build
 
 #if !UNITY_WEBPLAYER && !UNITY_WINRT && !UNITY_WEBGL
-
+        /// <summary>
+        /// Checks if a file exists.
+        /// </summary>
         public static bool FileExists(string fileName) => File.Exists(fileName);
 
-		public static void DeleteFile(string fileName)
-		{
-			File.Delete(fileName);
-		}
+        /// <summary>
+        /// Deletes a file.
+        /// </summary>
+        public static void DeleteFile(string fileName)
+        {
+            File.Delete(fileName);
+        }
 
-		public static string ReadTextFile(string fileName) => File.ReadAllText(fileName);
+        /// <summary>
+        /// Reads the content of a text file.
+        /// </summary>
+        public static string ReadTextFile(string fileName) => File.ReadAllText(fileName);
 
-		public static void WriteTextFile(string fileName, string content)
-		{
-			File.WriteAllText(fileName, content);
-		}
-
+        /// <summary>
+        /// Writes content to a text file.
+        /// </summary>
+        public static void WriteTextFile(string fileName, string content)
+        {
+            File.WriteAllText(fileName, content);
+        }
 #endif
 
         #endregion
@@ -48,113 +58,37 @@ namespace egads.system.fileManagement
         #region WebGL Build
 
 #if UNITY_WEBGL
+        /// <summary>
+        /// Checks if a file exists (WebGL platform).
+        /// </summary>
+        public static bool FileExists(string fileName)
+        {
+            return false; // Always return false for WebGL
+        }
 
-		public static bool FileExists(string fileName)
-		{
-			return false;  // Always return false
-		}
+        /// <summary>
+        /// Deletes a file (WebGL platform).
+        /// </summary>
+        public static void DeleteFile(string fileName)
+        {
+            // Do nothing; not supported in WebGL
+        }
 
-		public static void DeleteFile(string fileName)
-		{
-			// Do nothing; will not be called
-		}
+        /// <summary>
+        /// Reads the content of a text file (WebGL platform).
+        /// </summary>
+        public static string ReadTextFile(string fileName)
+        {
+            return ""; // Do nothing; not supported in WebGL
+        }
 
-		public static string ReadTextFile(string fileName)
-		{
-			return ""; // Do nothing
-		}
-
-		public static void WriteTextFile(string fileName, string content)
-		{
-			// Do nothing
-		}
-
-#endif
-
-        #endregion
-
-        #region WebPlayer Build
-
-#if UNITY_WEBPLAYER
-
-				public static bool FileExists(string fileName)
-				{
-					return false;  // Always return false
-				}
-
-				public static void DeleteFile(string fileName)
-				{
-					// Do nothing
-				}
-
-				public static string ReadTextFile(string fileName)
-				{
-					return ""; // Do nothing
-				}
-
-				public static void WriteTextFile(string fileName, string content)
-				{
-					// Do nothing
-				}
-
-#endif
-
-        #endregion
-
-        #region Metro Build
-
-#if UNITY_METRO
-
-				public static bool FileExists(string fileName) => UnityEngine.Windows.File.Exists(fileName);
-
-				public static void DeleteFile(string fileName)
-				{
-					UnityEngine.Windows.File.Delete(fileName);
-				}
-
-				public static string ReadTextFile(string fileName)
-				{
-					var bytes = UnityEngine.Windows.File.ReadAllBytes(fileName);
-					return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-				}
-
-				public static void WriteTextFile(string fileName, string content)
-				{
-					var bytes = System.Text.Encoding.UTF8.GetBytes(content);
-					UnityEngine.Windows.File.WriteAllBytes(fileName, bytes);
-				}
-
-#endif
-
-        #endregion
-
-        #region WP8 Build
-
-#if UNITY_WP8
-
-		public static bool FileExists(string fileName) => UnityEngine.Windows.File.Exists(fileName);
-
-		public static void DeleteFile(string fileName)
-		{
-			UnityEngine.Windows.File.Delete(fileName);
-		}
-
-		public static string ReadTextFile(string fileName)
-		{
-			using (StreamReader reader = new StreamReader(fileName, System.Text.Encoding.UTF8))
-			{
-				return reader.ReadToEnd();
-			}
-		}
-
-		public static void WriteTextFile(string fileName, string content)
-		{
-			using (StreamWriter writer = new StreamWriter(fileName, false, System.Text.Encoding.UTF8))
-			{
-				writer.Write(content);
-			}
-		}
-
+        /// <summary>
+        /// Writes content to a text file (WebGL platform).
+        /// </summary>
+        public static void WriteTextFile(string fileName, string content)
+        {
+            // Do nothing; not supported in WebGL
+        }
 #endif
 
         #endregion
