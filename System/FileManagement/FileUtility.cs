@@ -6,8 +6,13 @@ using System.IO;
 
 namespace egads.system.fileManagement
 {
+    /// <summary>
+    /// Provides utility functions for file management, including checking, reading, and writing files.
+    /// </summary>
     public static class FileUtility
     {
+        #region Loadable and Saveable
+
         /// <summary>
         /// Indicates whether the platform can load and save files.
         /// </summary>
@@ -15,13 +20,12 @@ namespace egads.system.fileManagement
         {
             get
             {
-                if (Application.platform == RuntimePlatform.WebGLPlayer)
-                {
-                    return false;
-                }
+                if (Application.platform == RuntimePlatform.WebGLPlayer) { return false; }
                 return true;
             }
         }
+
+        #endregion
 
         #region Non Web Build
 
