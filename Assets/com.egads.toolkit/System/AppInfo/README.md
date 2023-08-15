@@ -1,14 +1,11 @@
 # Application System User Guide
+The `ApplicationInfo` class contains information about the application's settings and platform-specific configurations. It is used to determine various input capabilities of the device, such as whether it has two mouse buttons, supports touch input, or uses a gamepad. This guide will provide an overview of the class and explain its public properties, constructors, and methods.
 
 ## Table of Contents
-- [Overview](#overview)
 - [Classes](#classes)
   - [ApplicationInfo](#applicationinfo)
 - [Usage Examples](#usage-examples)
   - [Initialize an App](#initialize-an-app)
-
-## Overview
-The `ApplicationInfo` class contains information about the application's settings and platform-specific configurations. It is used to determine various input capabilities of the device, such as whether it has two mouse buttons, supports touch input, or uses a gamepad. This guide will provide an overview of the class and explain its public properties, constructors, and methods.
 
 ## Classes
 ### ApplicationInfo
