@@ -1,6 +1,6 @@
 # Orders System User Guide
 
-This Orders System is a set of interfaces and classes designed to manage and execute orders in a flexible and organized manner. Orders can be performed either in parallel (OrderList) or sequentially (OrderQueue). The system allows you to define custom orders by implementing the provided interfaces.
+This Orders System is a set of interfaces and classes designed to manage and execute orders in a flexible and organized manner. Orders can be performed either in parallel (OrderList) or sequentially (OrderQueue). The system allows you to define custom orders by implementing the provided interfaces. The Orders System provides a simple yet powerful way to manage orders in Unity. It includes two main classes, `OrderList` and `OrderQueue`, which allow you to execute orders either simultaneously or sequentially.
 
 ## Table of Contents
 
@@ -15,10 +15,6 @@ This Orders System is a set of interfaces and classes designed to manage and exe
    - [OrderQueue](#orderqueue)
 4. [Custom Order Example](#custom-order-example)
 5. [Usage Examples](#usage-examples)
-
-## Overview
-
-The Orders System provides a simple yet powerful way to manage orders in Unity. It includes two main classes, `OrderList` and `OrderQueue`, which allow you to execute orders either simultaneously or sequentially.
 
 ## Interfaces
 
