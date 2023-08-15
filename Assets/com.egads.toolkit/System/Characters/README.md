@@ -1,8 +1,7 @@
 # Characters System User Guide
-The Characters System is a collection of interfaces and classes designed to facilitate the management of 2D characters (game objects) in Unity. It provides a set of components and functionalities that can be used to create and control characters with various behaviors such as movement, health, rendering, and interaction.
+The Characters System is a collection of interfaces and classes designed to facilitate the management of 2D characters (game objects) in Unity. It provides a set of components and functionalities that can be used to create and control characters with various behaviors such as movement, health, rendering, and interaction. The system is built around the concept of characters, which are 2D game objects that can represent characters, enemies, NPCs, or any other entities that require specific behaviors and interactions in a game.
 
 ## Table of Contents
-- [Overview](#overview)
 - [Interfaces](#interfaces)
   - [ICharacter](#icharacter)
   - [ICharacterTimedOrder](#icharactertimedorder)
@@ -27,9 +26,6 @@ The Characters System is a collection of interfaces and classes designed to faci
   - [Making a Character Perform a Melee Attack](#making-a-character-perform-a-melee-attack)
   - [Applying Damage on Contact](#applying-damage-on-contact)
   - [Detecting Another Character with Sensor2D](#detecting-another-character-with-sensor2d)
-
-## Overview
-The system is built around the concept of characters, which are 2D game objects that can represent characters, enemies, NPCs, or any other entities that require specific behaviors and interactions in a game.
 
 ## Interfaces
 
